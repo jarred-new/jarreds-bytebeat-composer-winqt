@@ -48,8 +48,19 @@
     <addaction name="actionCut"/>
     <addaction name="actionPaste"/>
    </widget>
+   <widget class="QMenu" name="menu_Bytebeat">
+    <property name="title">
+     <string>&amp;Bytebeat</string>
+    </property>
+    <addaction name="actionSet_Frequency"/>
+    <addaction name="actionSet_Bytebeat_Type"/>
+    <addaction name="separator"/>
+    <addaction name="action_Play"/>
+    <addaction name="actionStop"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
+   <addaction name="menu_Bytebeat"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -70,6 +81,11 @@
    <addaction name="actionCopy"/>
    <addaction name="actionCut"/>
    <addaction name="actionPaste"/>
+   <addaction name="separator"/>
+   <addaction name="actionSet_Frequency"/>
+   <addaction name="actionSet_Bytebeat_Type"/>
+   <addaction name="action_Play"/>
+   <addaction name="actionStop"/>
   </widget>
   <action name="actionNew">
    <property name="icon">
@@ -202,6 +218,65 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+X</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionSet_Frequency">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::MediaTape"/>
+   </property>
+   <property name="text">
+    <string>Set &amp;Frequency</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the player's audio frequency&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+F</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionSet_Bytebeat_Type">
+   <property name="text">
+    <string>Set Bytebeat &amp;Type</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the player's bytebeat type:&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;List of types:&lt;/p&gt;&lt;p&gt;  * Bytebeat (default)&lt;/p&gt;&lt;p&gt;  * Signed Bytebeat&lt;/p&gt;&lt;p&gt;  * Floatbeat&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_Play">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::MediaPlaybackStart"/>
+   </property>
+   <property name="text">
+    <string>&amp;Play</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionStop">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::MediaPlaybackStop"/>
+   </property>
+   <property name="text">
+    <string>Stop</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+.</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

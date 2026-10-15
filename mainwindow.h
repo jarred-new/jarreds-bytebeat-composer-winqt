@@ -3,6 +3,12 @@
 
 #include <QMainWindow>
 
+#include <QCloseEvent>
+
+#include <QMessageBox>
+#include <QPushButton>
+#include <QClipboard>
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -16,6 +22,9 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     Ui::MainWindow *ui;
