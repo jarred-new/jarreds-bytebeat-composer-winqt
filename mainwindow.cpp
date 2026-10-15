@@ -23,5 +23,28 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    event->ignore();
+    QMessageBox comfirmClose(this);
 
+    comfirmClose.setWindowTitle("Quit?");
+    comfirmClose.setText("Do you want to save your formula?");
+    comfirmClose.setIcon(QMessageBox::Question);
+
+    QPushButton *yesButton = comfirmClose.addButton(QMessageBox::Yes);
+    QPushButton *noButton = comfirmClose.addButton(QMessageBox::No);
+    QPushButton *cancelButton = comfirmClose.addButton(QMessageBox::Cancel);
+
+    comfirmClose.setDefaultButton(yesButton);
+
+    comfirmClose.exec();
+
+    if (comfirmClose.clickedButton() == yesButton) {
+        // TODO: save logic
+    }
+    else if (comfirmClose.clickedButton() == noButton) {
+        event->accept();
+    }
+    else if (comfirmClose.clickedButton() == cancelButton) {
+        event->ignore();
+    }
 }
