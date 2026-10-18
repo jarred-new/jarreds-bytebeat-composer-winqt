@@ -44,6 +44,14 @@ else()
     endif()
 endif()
 
+target_compile_options(JarredsBeatComposer PRIVATE
+    $<$<CXX_COMPILER_ID:MSVC>:/bigobj>
+)
+
+# if(MSVC)
+#     add_compile_options(/bigobj)
+# endif()
+
 target_link_libraries(JarredsBeatComposer PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Multimedia
@@ -54,6 +62,7 @@ target_link_libraries(JarredsBeatComposer PRIVATE
 target_include_directories(JarredsBeatComposer PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/exprtk/include
 )
+
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an

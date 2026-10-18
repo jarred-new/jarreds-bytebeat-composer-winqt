@@ -26,7 +26,7 @@ bool BytebeatFormula::setFormula(const QString &formula)
 }
 
 // getFormula()
-qint8 BytebeatFormula::getFormula(quint32 currentT)
+quint8 BytebeatFormula::getFormula(quint32 currentT)
 {
     QMutexLocker locker(&m_mutex);
 
@@ -34,6 +34,6 @@ qint8 BytebeatFormula::getFormula(quint32 currentT)
     m_tVar = static_cast<double>(currentT);
 
     // Compute the expression and clamp it safely down to raw 8-bit PCM (0-255)
-    double result = m_expression.value();
+    double result = expr.value();
     return static_cast<quint8>(static_cast<quint32>(result) & 0xFF);
 }

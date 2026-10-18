@@ -9,6 +9,27 @@
 #include <QPushButton>
 #include <QClipboard>
 
+#include <QAudioFormat>
+#include <QAudioSink>
+#include <QMediaDevices>
+#include <QIODevice>
+
+#include <QTimer>
+#include <QString>
+
+#include <QFile>
+#include <QTextStream>
+#include <QFileDialog>
+
+#include <QInputDialog>
+
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+
+#include "bytebeatdevice.h"
+#include "bytebeatformula.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -24,9 +45,31 @@ public:
     ~MainWindow() override;
 
 protected:
+    // Close event
     void closeEvent(QCloseEvent *event) override;
+
+    bool isNew;
+    bool isOpen;
+    bool isChanged;
+
+    int sampleRate = 8000;
+
+protected slots:
+    // file
+    void newFile();
+    bool openFile();
+    bool saveFile();
+    bool saveAsFile();
+
+    // bytebeat
+    void playBeat();
+    void stopBeat();
+    void setFrequency();
 
 private:
     Ui::MainWindow *ui;
+    BytebeatFormula* formulaBackend;
+    BytebeatDevice* audioDevice;
+    QAudioSink* audioSink = nullptr;
 };
 #endif // MAINWINDOW_H
