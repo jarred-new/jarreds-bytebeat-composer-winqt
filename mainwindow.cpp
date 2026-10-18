@@ -97,10 +97,12 @@ void MainWindow::playBeat()
         return;
     }
 
-    QAudioFormat format;
+    QAudioFormat format = outputDevice.preferredFormat();
     format.setSampleRate(sampleRate);
-    format.setChannelCount(1);
-    format.setSampleFormat(QAudioFormat::UInt8);
+    const bool requestedFormatSupported = outputDevice.isFormatSupported(format);
+    if (!requestedFormatSupported) {
+        format = outputDevice.preferredFormat();
+    }
 
     audioDevice->setAudioFormat(format);
     if (!audioDevice->open(QIODevice::ReadOnly)) {
@@ -119,7 +121,11 @@ void MainWindow::playBeat()
     });
     audioSink->start(audioDevice);
     if (audioSink->error() != QAudio::NoError) {
-        ui->statusbar->showMessage("Could not start audio playback", 5000);
+        ui->statusbar->showMessage("Could not start audio playback (error "
+                                       + QString::number(audioSink->error()) + ")", 5000);
+    } else if (!requestedFormatSupported) {
+        ui->statusbar->showMessage("Requested format unavailable; playing at "
+                                       + QString::number(format.sampleRate()) + " Hz", 5000);
     }
 
 }
