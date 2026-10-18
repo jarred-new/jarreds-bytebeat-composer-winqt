@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->plainTextEdit->setPlainText("t");
 
     /* Bytebeat Device Creation */
     // Create the persistent ExprTk backend formula tracker
@@ -91,6 +92,14 @@ void MainWindow::playBeat()
     }
 
     audioSink = new QAudioSink(outputDevice, format, this);
+    connect(audioSink, &QAudioSink::stateChanged, this, [this](QAudio::State state) {
+        if (state == QAudio::ActiveState) {
+            ui->statusbar->showMessage("Playing", 2000);
+        } else if (audioSink != nullptr && audioSink->error() != QAudio::NoError) {
+            ui->statusbar->showMessage("Audio playback failed (error "
+                                           + QString::number(audioSink->error()) + ")", 5000);
+        }
+    });
     audioSink->start(audioDevice);
     if (audioSink->error() != QAudio::NoError) {
         ui->statusbar->showMessage("Could not start audio playback", 5000);
