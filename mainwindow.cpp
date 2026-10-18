@@ -17,6 +17,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     /* Menu and QActions */
     // File
+    connect(ui->actionNew, &QAction::triggered, this, &MainWindow::newFile);
+    connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::openFile);
+    connect(ui->actionSave, &QAction::triggered, this, &MainWindow::saveFile);
+    connect(ui->actionSave_As, &QAction::triggered, this, &MainWindow::saveAsFile);
     connect(ui->actionExit, &QAction::triggered, this, &MainWindow::close);
 
     // Edit Menu
@@ -29,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionStop, &QAction::triggered, this, &MainWindow::stopBeat);
 }
 
+// cleanup event
 MainWindow::~MainWindow()
 {
     stopBeat();
@@ -37,6 +42,7 @@ MainWindow::~MainWindow()
     delete audioDevice;
 }
 
+// close event
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     event->ignore();
@@ -55,7 +61,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
     comfirmClose.exec();
 
     if (comfirmClose.clickedButton() == yesButton) {
-        // TODO: save logic
+        saveFile();
+        event->accept();
     }
     else if (comfirmClose.clickedButton() == noButton) {
         event->accept();
@@ -65,6 +72,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 }
 
+// play/stop bytebeat
 void MainWindow::playBeat()
 {
     if (audioSink != nullptr) {
@@ -117,4 +125,69 @@ void MainWindow::stopBeat()
         delete audioSink;
         audioSink = nullptr;
     }
+}
+
+// file menu actions
+void MainWindow::newFile()
+{
+    isNew = true;
+    isOpen = false;
+    isChanged = false;
+    ui->plainTextEdit->clear();
+    ui->statusbar->showMessage("New file created", 2000);
+}
+
+bool MainWindow::openFile()
+{
+    isNew = false;
+    isOpen = true;
+    isChanged = false;
+
+    QString fileName = QFileDialog::getOpenFileName(this, "Open File", "", "JSON Files (*.json);;Plain Text Files (*.txt);;All Files (*)");
+    if (!fileName.isEmpty()) {
+        QFile file(fileName);
+        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            ui->plainTextEdit->setPlainText(file.readAll());
+            file.close();
+        }
+    }
+    return true;
+}
+
+bool MainWindow::saveFile()
+{
+    if (isNew) {
+        return saveAsFile();
+    } else {
+        QString fileName = ui->statusbar->currentMessage();
+        QFile file(fileName);
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            QTextStream stream(&file);
+            stream << ui->plainTextEdit->toPlainText();
+            file.close();
+        }
+    }
+
+    return true;
+}
+
+bool MainWindow::saveAsFile()
+{
+    isNew = false;
+    isOpen = true;
+    isChanged = false;
+
+    QString fileName = QFileDialog::getSaveFileName(this, "Save As...", "", "JSON Files (*.json);;Plain Text Files (*.txt);;All Files (*)");
+    if (!fileName.isEmpty()) {
+        QFile file(fileName);
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            QTextStream stream(&file);
+            stream << ui->plainTextEdit->toPlainText();
+            file.close();
+        }
+    }
+    else {
+        return false; // User canceled the save dialog
+    }
+    return true;
 }

@@ -14,6 +14,17 @@
 #include <QMediaDevices>
 #include <QIODevice>
 
+#include <QTimer>
+#include <QString>
+
+#include <QFile>
+#include <QTextStream>
+#include <QFileDialog>
+
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+
 #include "bytebeatdevice.h"
 #include "bytebeatformula.h"
 
@@ -32,9 +43,21 @@ public:
     ~MainWindow() override;
 
 protected:
+    // Close event
     void closeEvent(QCloseEvent *event) override;
 
+    bool isNew;
+    bool isOpen;
+    bool isChanged;
+
 protected slots:
+    // file
+    void newFile();
+    bool openFile();
+    bool saveFile();
+    bool saveAsFile();
+
+    // bytebeat
     void playBeat();
     void stopBeat();
 
