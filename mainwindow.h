@@ -9,6 +9,13 @@
 #include <QPushButton>
 #include <QClipboard>
 
+#include <QAudioFormat>
+#include <QAudioSink>
+#include <QIODevice>
+
+#include "bytebeatdevice.h"
+#include "bytebeatformula.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -26,7 +33,14 @@ public:
 protected:
     void closeEvent(QCloseEvent *event) override;
 
+protected slots:
+    void playBeat();
+    void stopBeat();
+
 private:
     Ui::MainWindow *ui;
+    BytebeatFormula* formulaBackend;
+    BytebeatDevice* audioDevice;
+    QAudioSink* audioSink;
 };
 #endif // MAINWINDOW_H
