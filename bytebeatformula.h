@@ -18,7 +18,7 @@ public:
     explicit BytebeatFormula(QObject *parent = nullptr);
 
     bool setFormula(const QString& formula);
-    qint8 getFormula(quint32 currentT);
+    quint8 getFormula(quint32 currentT);
 
 private:
     QMutex m_mutex;

@@ -26,7 +26,7 @@ bool BytebeatFormula::setFormula(const QString &formula)
 }
 
 // getFormula()
-qint8 BytebeatFormula::getFormula(quint32 currentT)
+quint8 BytebeatFormula::getFormula(quint32 currentT)
 {
     QMutexLocker locker(&m_mutex);
 

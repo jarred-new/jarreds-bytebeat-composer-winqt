@@ -1,6 +1,7 @@
 #ifndef BYTEBEATDEVICE_H
 #define BYTEBEATDEVICE_H
 
+#include <QAudioFormat>
 #include <QIODevice>
 #include "bytebeatformula.h"
 
@@ -10,6 +11,7 @@ public:
     // Pass our backend object pointer into the device loop
     explicit BytebeatDevice(BytebeatFormula* backend, QObject *parent = nullptr);
 
+    void setAudioFormat(const QAudioFormat& format);
     bool open(OpenMode mode) override;
     void close() override;
     qint64 readData(char *data, qint64 maxlen) override;
@@ -18,6 +20,7 @@ public:
 
 private:
     BytebeatFormula* m_backend;
+    QAudioFormat m_format;
     quint32 t = 0;
 };
 

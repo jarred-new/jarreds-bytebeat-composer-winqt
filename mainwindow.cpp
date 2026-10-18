@@ -25,10 +25,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Bytebeat Menu
     connect(ui->action_Play, &QAction::triggered, this, &MainWindow::playBeat);
+    connect(ui->actionStop, &QAction::triggered, this, &MainWindow::stopBeat);
 }
 
 MainWindow::~MainWindow()
 {
+    stopBeat();
     delete ui;
     delete formulaBackend;
     delete audioDevice;
@@ -64,20 +66,34 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::playBeat()
 {
-    // Setup your audio stream specifications
-    QAudioFormat format;
-    format.setSampleRate(8000);
-    format.setChannelCount(1);
-    format.setSampleFormat(QAudioFormat::UInt8);
+    if (audioSink != nullptr) {
+        audioSink->stop();
+        delete audioSink;
+        audioSink = nullptr;
+    }
 
-    audioDevice->open(QIODevice::ReadOnly);
+    if (!formulaBackend->setFormula(ui->plainTextEdit->toPlainText())) {
+        ui->statusbar->showMessage("Invalid bytebeat formula", 5000);
+        return;
+    }
 
-    audioSink = new QAudioSink(format, this);
+    const QAudioDevice outputDevice = QMediaDevices::defaultAudioOutput();
+    if (outputDevice.isNull()) {
+        ui->statusbar->showMessage("No audio output device is available", 5000);
+        return;
+    }
+
+    const QAudioFormat format = outputDevice.preferredFormat();
+    audioDevice->setAudioFormat(format);
+    if (!audioDevice->open(QIODevice::ReadOnly)) {
+        ui->statusbar->showMessage("Could not open the bytebeat audio stream", 5000);
+        return;
+    }
+
+    audioSink = new QAudioSink(outputDevice, format, this);
     audioSink->start(audioDevice);
-
-    bool success = formulaBackend->setFormula(ui->plainTextEdit->toPlainText());
-    if (!success) {
-        // Show validation error toast/label in UI
+    if (audioSink->error() != QAudio::NoError) {
+        ui->statusbar->showMessage("Could not start audio playback", 5000);
     }
 
 }
@@ -89,5 +105,7 @@ void MainWindow::stopBeat()
     }
     if (audioSink != nullptr) {
         audioSink->stop();
+        delete audioSink;
+        audioSink = nullptr;
     }
 }

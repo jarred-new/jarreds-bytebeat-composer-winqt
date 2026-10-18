@@ -11,6 +11,7 @@
 
 #include <QAudioFormat>
 #include <QAudioSink>
+#include <QMediaDevices>
 #include <QIODevice>
 
 #include "bytebeatdevice.h"
@@ -41,6 +42,6 @@ private:
     Ui::MainWindow *ui;
     BytebeatFormula* formulaBackend;
     BytebeatDevice* audioDevice;
-    QAudioSink* audioSink;
+    QAudioSink* audioSink = nullptr;
 };
 #endif // MAINWINDOW_H
