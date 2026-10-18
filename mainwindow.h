@@ -21,6 +21,8 @@
 #include <QTextStream>
 #include <QFileDialog>
 
+#include <QInputDialog>
+
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -50,6 +52,8 @@ protected:
     bool isOpen;
     bool isChanged;
 
+    int sampleRate = 8000;
+
 protected slots:
     // file
     void newFile();
@@ -60,6 +64,7 @@ protected slots:
     // bytebeat
     void playBeat();
     void stopBeat();
+    void setFrequency();
 
 private:
     Ui::MainWindow *ui;

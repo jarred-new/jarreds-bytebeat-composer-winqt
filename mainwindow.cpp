@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Bytebeat Menu
     connect(ui->action_Play, &QAction::triggered, this, &MainWindow::playBeat);
     connect(ui->actionStop, &QAction::triggered, this, &MainWindow::stopBeat);
+    connect(ui->actionSet_Frequency, &QAction::triggered, this, &MainWindow::setFrequency);
 }
 
 // cleanup event
@@ -61,8 +62,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
     comfirmClose.exec();
 
     if (comfirmClose.clickedButton() == yesButton) {
-        saveFile();
-        event->accept();
+        if (saveFile()) {
+            event->accept();
+        }
+        else {
+            event->ignore();
+        }
     }
     else if (comfirmClose.clickedButton() == noButton) {
         event->accept();
@@ -92,7 +97,11 @@ void MainWindow::playBeat()
         return;
     }
 
-    const QAudioFormat format = outputDevice.preferredFormat();
+    QAudioFormat format;
+    format.setSampleRate(sampleRate);
+    format.setChannelCount(1);
+    format.setSampleFormat(QAudioFormat::UInt8);
+
     audioDevice->setAudioFormat(format);
     if (!audioDevice->open(QIODevice::ReadOnly)) {
         ui->statusbar->showMessage("Could not open the bytebeat audio stream", 5000);
@@ -124,6 +133,19 @@ void MainWindow::stopBeat()
         audioSink->stop();
         delete audioSink;
         audioSink = nullptr;
+    }
+}
+
+void MainWindow::setFrequency()
+{
+    bool ok;
+    int inputFreq = QInputDialog::getInt(this,
+                         "Set Frequency",
+                         "example: 8000, 11025, 16000, 22050, 32000, etc.",
+                         sampleRate, 0, 999999, 10, &ok, Qt::Dialog);
+
+    if (ok) {
+        this->sampleRate = inputFreq;
     }
 }
 
