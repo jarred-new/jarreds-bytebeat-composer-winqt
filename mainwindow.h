@@ -48,9 +48,7 @@ protected:
     // Close event
     void closeEvent(QCloseEvent *event) override;
 
-    bool isNew;
-    bool isOpen;
-    bool isChanged;
+    bool isChanged = false;
 
     int sampleRate = 8000;
 
@@ -67,7 +65,11 @@ protected slots:
     void setFrequency();
 
 private:
+    bool confirmDiscardChanges();
+    bool writeFile(const QString& fileName);
+
     Ui::MainWindow *ui;
+    QString currentFilePath;
     BytebeatFormula* formulaBackend;
     BytebeatDevice* audioDevice;
     QAudioSink* audioSink = nullptr;

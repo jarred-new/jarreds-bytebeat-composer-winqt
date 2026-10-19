@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
+#include <QSaveFile>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -27,6 +29,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionCopy, &QAction::triggered, ui->plainTextEdit, &QPlainTextEdit::copy);
     connect(ui->actionCut, &QAction::triggered, ui->plainTextEdit, &QPlainTextEdit::cut);
     connect(ui->actionPaste, &QAction::triggered, ui->plainTextEdit, &QPlainTextEdit::paste);
+    connect(ui->plainTextEdit, &QPlainTextEdit::textChanged, this, [this]() {
+        isChanged = true;
+    });
 
     // Bytebeat Menu
     connect(ui->action_Play, &QAction::triggered, this, &MainWindow::playBeat);
@@ -46,11 +51,16 @@ MainWindow::~MainWindow()
 // close event
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    if (!isChanged) {
+        event->accept();
+        return;
+    }
+
     event->ignore();
     QMessageBox comfirmClose(this);
 
     comfirmClose.setWindowTitle("Quit?");
-    comfirmClose.setText("Do you want to save your formula?");
+    comfirmClose.setText("Save changes to your formula before closing?");
     comfirmClose.setIcon(QMessageBox::Question);
 
     QPushButton *yesButton = comfirmClose.addButton(QMessageBox::Yes);
@@ -80,11 +90,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 // play/stop bytebeat
 void MainWindow::playBeat()
 {
-    if (audioSink != nullptr) {
-        audioSink->stop();
-        delete audioSink;
-        audioSink = nullptr;
-    }
+    stopBeat();
 
     if (!formulaBackend->setFormula(ui->plainTextEdit->toPlainText())) {
         ui->statusbar->showMessage("Invalid bytebeat formula", 5000);
@@ -132,13 +138,13 @@ void MainWindow::playBeat()
 
 void MainWindow::stopBeat()
 {
-    if (audioDevice != nullptr) {
-        audioDevice->close();
-    }
     if (audioSink != nullptr) {
         audioSink->stop();
         delete audioSink;
         audioSink = nullptr;
+    }
+    if (audioDevice != nullptr) {
+        audioDevice->close();
     }
 }
 
@@ -148,7 +154,7 @@ void MainWindow::setFrequency()
     int inputFreq = QInputDialog::getInt(this,
                          "Set Frequency",
                          "example: 8000, 11025, 16000, 22050, 32000, etc.",
-                         sampleRate, 0, 999999, 10, &ok, Qt::Dialog);
+                         sampleRate, 8000, 192000, 100, &ok, Qt::Dialog);
 
     if (ok) {
         this->sampleRate = inputFreq;
@@ -158,64 +164,95 @@ void MainWindow::setFrequency()
 // file menu actions
 void MainWindow::newFile()
 {
-    isNew = true;
-    isOpen = false;
-    isChanged = false;
+    if (!confirmDiscardChanges()) {
+        return;
+    }
+
     ui->plainTextEdit->clear();
+    currentFilePath.clear();
+    isChanged = false;
     ui->statusbar->showMessage("New file created", 2000);
 }
 
 bool MainWindow::openFile()
 {
-    isNew = false;
-    isOpen = true;
-    isChanged = false;
-
-    QString fileName = QFileDialog::getOpenFileName(this, "Open File", "", "JSON Files (*.json);;Plain Text Files (*.txt);;All Files (*)");
-    if (!fileName.isEmpty()) {
-        QFile file(fileName);
-        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            ui->plainTextEdit->setPlainText(file.readAll());
-            file.close();
-        }
+    if (!confirmDiscardChanges()) {
+        return false;
     }
+
+    QString fileName = QFileDialog::getOpenFileName(this, "Open File", "", "Bytebeat Formulas (*.bb *.txt);;All Files (*)");
+    if (fileName.isEmpty()) {
+        return false;
+    }
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        ui->statusbar->showMessage("Could not open the selected file", 5000);
+        return false;
+    }
+
+    ui->plainTextEdit->setPlainText(QString::fromUtf8(file.readAll()));
+    currentFilePath = fileName;
+    isChanged = false;
     return true;
 }
 
 bool MainWindow::saveFile()
 {
-    if (isNew) {
+    if (currentFilePath.isEmpty()) {
         return saveAsFile();
-    } else {
-        QString fileName = ui->statusbar->currentMessage();
-        QFile file(fileName);
-        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            QTextStream stream(&file);
-            stream << ui->plainTextEdit->toPlainText();
-            file.close();
-        }
     }
 
-    return true;
+    return writeFile(currentFilePath);
 }
 
 bool MainWindow::saveAsFile()
 {
-    isNew = false;
-    isOpen = true;
-    isChanged = false;
+    QString fileName = QFileDialog::getSaveFileName(this, "Save As...", "", "Bytebeat Formulas (*.bb *.txt);;All Files (*)");
+    if (fileName.isEmpty()) {
+        return false;
+    }
 
-    QString fileName = QFileDialog::getSaveFileName(this, "Save As...", "", "JSON Files (*.json);;Plain Text Files (*.txt);;All Files (*)");
-    if (!fileName.isEmpty()) {
-        QFile file(fileName);
-        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            QTextStream stream(&file);
-            stream << ui->plainTextEdit->toPlainText();
-            file.close();
-        }
+    return writeFile(fileName);
+}
+
+bool MainWindow::confirmDiscardChanges()
+{
+    if (!isChanged) {
+        return true;
     }
-    else {
-        return false; // User canceled the save dialog
+
+    const QMessageBox::StandardButton answer = QMessageBox::question(
+        this,
+        "Unsaved changes",
+        "Save changes before continuing?",
+        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+        QMessageBox::Yes);
+
+    if (answer == QMessageBox::Yes) {
+        return saveFile();
     }
+    return answer == QMessageBox::No;
+}
+
+bool MainWindow::writeFile(const QString& fileName)
+{
+    QSaveFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        ui->statusbar->showMessage("Could not save the selected file", 5000);
+        return false;
+    }
+
+    QTextStream stream(&file);
+    stream << ui->plainTextEdit->toPlainText();
+    stream.flush();
+    if (stream.status() != QTextStream::Ok || !file.commit()) {
+        ui->statusbar->showMessage("Could not save the selected file", 5000);
+        return false;
+    }
+
+    currentFilePath = fileName;
+    isChanged = false;
+    ui->statusbar->showMessage("Saved " + currentFilePath, 3000);
     return true;
 }
