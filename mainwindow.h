@@ -70,7 +70,7 @@ private:
 
     Ui::MainWindow *ui;
     QString currentFilePath;
-    BytebeatGenerator* audioDevice = nullptr;
+    BytebeatDevice* audioDevice = nullptr;
     QAudioSink* audioSink = nullptr;
 };
 #endif // MAINWINDOW_H
