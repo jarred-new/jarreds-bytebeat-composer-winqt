@@ -10,13 +10,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     ui->plainTextEdit->setPlainText("t");
 
-    /* Bytebeat Device Creation */
-    // Create the persistent ExprTk backend formula tracker
-    formulaBackend = new BytebeatFormula();
-
-    // Create the device feeding it the backend, and spin up the sink
-    audioDevice = new BytebeatDevice(formulaBackend, this);
-
     /* Menu and QActions */
     // File
     connect(ui->actionNew, &QAction::triggered, this, &MainWindow::newFile);
@@ -44,8 +37,6 @@ MainWindow::~MainWindow()
 {
     stopBeat();
     delete ui;
-    delete formulaBackend;
-    delete audioDevice;
 }
 
 // close event
@@ -92,11 +83,6 @@ void MainWindow::playBeat()
 {
     stopBeat();
 
-    if (!formulaBackend->setFormula(ui->plainTextEdit->toPlainText())) {
-        ui->statusbar->showMessage("Invalid bytebeat formula", 5000);
-        return;
-    }
-
     const QAudioDevice outputDevice = QMediaDevices::defaultAudioOutput();
     if (outputDevice.isNull()) {
         ui->statusbar->showMessage("No audio output device is available", 5000);
@@ -110,9 +96,19 @@ void MainWindow::playBeat()
         format = outputDevice.preferredFormat();
     }
 
+    audioDevice = new BytebeatGenerator(this);
+    if (!audioDevice->setFormula(ui->plainTextEdit->toPlainText())) {
+        delete audioDevice;
+        audioDevice = nullptr;
+        ui->statusbar->showMessage("Invalid bytebeat formula", 5000);
+        return;
+    }
+
     audioDevice->setAudioFormat(format);
     if (!audioDevice->open(QIODevice::ReadOnly)) {
         ui->statusbar->showMessage("Could not open the bytebeat audio stream", 5000);
+        delete audioDevice;
+        audioDevice = nullptr;
         return;
     }
 
@@ -145,6 +141,8 @@ void MainWindow::stopBeat()
     }
     if (audioDevice != nullptr) {
         audioDevice->close();
+        delete audioDevice;
+        audioDevice = nullptr;
     }
 }
 

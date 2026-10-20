@@ -21,8 +21,7 @@ set(PROJECT_SOURCES
 qt_add_executable(JarredsBeatComposer
     MANUAL_FINALIZATION
     ${PROJECT_SOURCES}
-    bytebeatdevice.h bytebeatdevice.cpp
-    bytebeatformula.h bytebeatformula.cpp
+    bytebeatgenerator.h
 )
 
 target_compile_options(JarredsBeatComposer PRIVATE

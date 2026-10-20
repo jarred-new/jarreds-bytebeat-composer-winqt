@@ -27,8 +27,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-#include "bytebeatdevice.h"
-#include "bytebeatformula.h"
+#include "bytebeatgenerator.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -70,8 +69,7 @@ private:
 
     Ui::MainWindow *ui;
     QString currentFilePath;
-    BytebeatFormula* formulaBackend;
-    BytebeatDevice* audioDevice;
+    BytebeatGenerator* audioDevice = nullptr;
     QAudioSink* audioSink = nullptr;
 };
 #endif // MAINWINDOW_H
