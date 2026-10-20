@@ -235,20 +235,20 @@ bool MainWindow::openFile()
         return false;
     }
 
-    if (fileName.endsWith(".json", Qt::CaseInsensitive))
+    if (fileName.endsWith(".bb", Qt::CaseInsensitive))
     {
         QJsonParseError parseError;
         QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &parseError);
         if (parseError.error != QJsonParseError::NoError || !doc.isObject())
         {
-            ui->statusbar->showMessage("Could not parse the selected JSON file", 5000);
+            ui->statusbar->showMessage("Could not parse the selected BB file", 5000);
             return false;
         }
 
         QJsonObject json = doc.object();
         if (!json.contains("formula") || !json["formula"].isString())
         {
-            ui->statusbar->showMessage("The selected JSON file does not contain a valid formula", 5000);
+            ui->statusbar->showMessage("The selected BB file does not contain a valid formula", 5000);
             return false;
         }
 
@@ -319,7 +319,7 @@ bool MainWindow::writeFile(const QString &fileName)
     }
 
     QTextStream stream(&file);
-    if (fileName.endsWith(".json", Qt::CaseInsensitive))
+    if (fileName.endsWith(".bb", Qt::CaseInsensitive))
     {
         // add all the settings
         QJsonObject json;
