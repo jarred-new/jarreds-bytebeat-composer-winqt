@@ -9,8 +9,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Multimedia)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Multimedia)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Multimedia)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -19,30 +18,12 @@ set(PROJECT_SOURCES
         mainwindow.ui
 )
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(JarredsBeatComposer
-        MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
-        bytebeatdevice.h bytebeatdevice.cpp
-        bytebeatformula.h bytebeatformula.cpp
-    )
-# Define target properties for Android with Qt 6 as:
-#    set_property(TARGET JarredsBeatComposer APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
-else()
-    if(ANDROID)
-        add_library(JarredsBeatComposer SHARED
-            ${PROJECT_SOURCES}
-        )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
-    else()
-        add_executable(JarredsBeatComposer
-            ${PROJECT_SOURCES}
-        )
-    endif()
-endif()
+qt_add_executable(JarredsBeatComposer
+    MANUAL_FINALIZATION
+    ${PROJECT_SOURCES}
+    bytebeatdevice.h bytebeatdevice.cpp
+    bytebeatformula.h bytebeatformula.cpp
+)
 
 target_compile_options(JarredsBeatComposer PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/bigobj>
@@ -53,8 +34,8 @@ target_compile_options(JarredsBeatComposer PRIVATE
 # endif()
 
 target_link_libraries(JarredsBeatComposer PRIVATE
-    Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::Multimedia
+    Qt6::Widgets
+    Qt6::Multimedia
 )
 
 # Third-party Libraries put here...
@@ -67,7 +48,7 @@ target_include_directories(JarredsBeatComposer PRIVATE
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
-if(${QT_VERSION} VERSION_LESS 6.1.0)
+if(Qt6_VERSION VERSION_LESS 6.1.0)
   set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.JarredsBeatComposer)
 endif()
 set_target_properties(JarredsBeatComposer PROPERTIES
@@ -85,6 +66,4 @@ install(TARGETS JarredsBeatComposer
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(JarredsBeatComposer)
-endif()
+qt_finalize_executable(JarredsBeatComposer)

@@ -21,7 +21,7 @@ jobs:
 
     runs-on: windows-2022
     permissions:
-      contents: write
+      contents: read
 
     steps:
 
@@ -30,6 +30,8 @@ jobs:
       # ----------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
 
       # ----------------------------------------
@@ -75,7 +77,7 @@ jobs:
       # ----------------------------------------
       # Build
       # ----------------------------------------
-      - name: Build Tanaw
+      - name: Build application
         shell: pwsh
         run: |
           cmake `
@@ -111,7 +113,6 @@ jobs:
 
           windeployqt `
             --release `
-            --qmldir . `
             --dir package `
             "build\Release\JarredsBeatComposer.exe"
 
@@ -149,8 +150,22 @@ jobs:
           name: JarredsBeatComposer-Windows-x64
           path: JarredsBeatComposer-Windows-x64.zip
 
+  publish-release:
+    name: Publish GitHub release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build-windows
+    runs-on: windows-2022
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: JarredsBeatComposer-Windows-x64
+          path: release-assets
+
       - name: Publish GitHub release
-        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: JarredsBeatComposer-Windows-x64.zip
+          files: release-assets/JarredsBeatComposer-Windows-x64.zip

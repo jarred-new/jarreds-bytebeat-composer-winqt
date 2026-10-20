@@ -1,5 +1,7 @@
 #include "bytebeatformula.h"
 
+#include <cmath>
+
 // CONSTRUCTOR
 BytebeatFormula::BytebeatFormula(QObject *parent)
     : QObject{parent}
@@ -33,7 +35,15 @@ quint8 BytebeatFormula::getFormula(quint32 currentT)
     // Update the bound reference variable
     m_tVar = static_cast<double>(currentT);
 
-    // Compute the expression and clamp it safely down to raw 8-bit PCM (0-255)
+    // Wrap signed bytebeat expressions into the unsigned 8-bit sample range.
     double result = expr.value();
-    return static_cast<quint8>(static_cast<quint32>(result) & 0xFF);
+    if (!std::isfinite(result)) {
+        return 0;
+    }
+
+    double wrapped = std::fmod(std::trunc(result), 256.0);
+    if (wrapped < 0.0) {
+        wrapped += 256.0;
+    }
+    return static_cast<quint8>(wrapped);
 }
