@@ -2,6 +2,7 @@
 #define BYTEBEATDEVICE_H
 
 #include <QAudioFormat>
+#include <QByteArray>
 #include <QIODevice>
 #include "bytebeatformula.h"
 
@@ -21,6 +22,8 @@ public:
 private:
     BytebeatFormula* m_backend;
     QAudioFormat m_format;
+    QByteArray m_pendingFrame;
+    qint64 m_pendingFrameOffset = 0;
     quint32 t = 0;
 };
 
