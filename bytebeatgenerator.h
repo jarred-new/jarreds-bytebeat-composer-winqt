@@ -1,29 +1,17 @@
 #ifndef BYTEBEATGENERATOR_H
 #define BYTEBEATGENERATOR_H
 
-#include <QAudioFormat>
-#include <QByteArray>
 #include <QIODevice>
 #include <QString>
 #include <QTimer>
 
-#include <cmath>
-#include <cstring>
-#include <string>
-
-#include "exprtk.hpp"
-
-#include <QIODevice>
-#include <QString>
-#include <string>
-#include <cmath>
 #define exprtk_disable_string_capabilities // Optimizes compilation size/speed
 #include "exprtk.hpp"
 
 class BytebeatDevice : public QIODevice {
     Q_OBJECT
 public:
-    BytebeatDevice(QObject *parent = nullptr) : QIODevice(parent) {
+    explicit BytebeatDevice(QObject *parent = nullptr) : QIODevice(parent) {
         // Expose 't' to the expression parser
         symbol_table.add_variable("t", t_val);
         symbol_table.add_constants();
@@ -37,6 +25,18 @@ public:
             return false; // Failed to parse formula
         }
         t_val = 0; // Reset time index on formula swap
+        formula_ready = true;
+        return true;
+    }
+
+    bool open(OpenMode mode) override {
+        if (mode != QIODevice::ReadOnly || !formula_ready) {
+            return false;
+        }
+        if (!QIODevice::open(mode)) {
+            return false;
+        }
+        QTimer::singleShot(0, this, [this]() { emit readyRead(); });
         return true;
     }
 
@@ -59,11 +59,13 @@ protected:
 
     qint64 writeData(const char *data, qint64 len) override {
         Q_UNUSED(data);
-        return len; // Read-only device stream
+        Q_UNUSED(len);
+        return 0;
     }
 
 private:
     double t_val = 0;
+    bool formula_ready = false;
     exprtk::symbol_table<double> symbol_table;
     exprtk::expression<double> expression;
 };

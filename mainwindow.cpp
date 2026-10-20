@@ -144,17 +144,19 @@ void MainWindow::playBeat()
     format.setChannelCount(1);  // Mono
     format.setSampleFormat(QAudioFormat::UInt8); // Unsigned 8-bit PCM
 
-    audioDevice = new BytebeatDevice(&a);
+    audioDevice = new BytebeatDevice(this);
     
     // Note: ExprTk treats bitwise operations out of the box
     QString formula = ui->plainTextEdit->toPlainText();
     
     if (!audioDevice->setFormula(formula)) {
+        delete audioDevice;
+        audioDevice = nullptr;
         ui->statusbar->showMessage("Invalid bytebeat formula", 5000);
-        return -1;
+        return;
     }
 
-    audioSink = new QAudioSink(format, &a);
+    audioSink = new QAudioSink(format, this);
     
     // Open device in read-only and fire the engine
     if (audioDevice->open(QIODevice::ReadOnly)) {
@@ -162,6 +164,10 @@ void MainWindow::playBeat()
         ui->statusbar->showMessage("Playing Bytebeat formula...", 2000);
     } else {
         ui->statusbar->showMessage("Failed to open sound engine pipeline.", 5000);
+        delete audioSink;
+        audioSink = nullptr;
+        delete audioDevice;
+        audioDevice = nullptr;
     }
 }
 
@@ -316,7 +322,7 @@ bool MainWindow::writeFile(const QString &fileName)
     if (fileName.endsWith(".json", Qt::CaseInsensitive))
     {
         // add all the settings
-        QJSONObject json;
+        QJsonObject json;
         json["formula"] = ui->plainTextEdit->toPlainText();
         json["sampleRate"] = sampleRate;
 
