@@ -6,10 +6,13 @@
 #include <QString>
 #include <QTimer>
 #include <cmath>
+#include <cstdint>
 #include <cstring>
+#include <limits>
 
 #define exprtk_disable_string_capabilities // Optimizes compilation size/speed
 #include "exprtk.hpp"
+#include "custoperators.h"
 
 class BytebeatDevice : public QIODevice {
     Q_OBJECT
@@ -18,6 +21,8 @@ public:
         // Expose 't' to the expression parser
         symbol_table.add_variable("t", t_val);
         symbol_table.add_constants();
+        symbol_table.add_function("ushr", unsigned_right_shift);
+        symbol_table.add_function("bitnot", bitwise_not);
         expression.register_symbol_table(symbol_table);
     }
 
@@ -115,6 +120,8 @@ private:
     double t_val = 0;
     bool formula_ready = false;
     QAudioFormat audio_format;
+    BytebeatUnsignedRightShift unsigned_right_shift;
+    BytebeatBitwiseNot bitwise_not;
     exprtk::symbol_table<double> symbol_table;
     exprtk::expression<double> expression;
 };

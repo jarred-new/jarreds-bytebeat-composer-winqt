@@ -22,6 +22,7 @@ qt_add_executable(JarredsBeatComposer
     MANUAL_FINALIZATION
     ${PROJECT_SOURCES}
     bytebeatgenerator.h
+    custoperators.h
 )
 
 target_compile_options(JarredsBeatComposer PRIVATE
