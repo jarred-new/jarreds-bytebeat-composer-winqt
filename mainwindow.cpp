@@ -24,6 +24,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->plainTextEdit, &QPlainTextEdit::textChanged, this, [this]()
             { isChanged = true; });
 
+    // View Menu
+    connect(ui->actionZoom_In, &QAction::triggered, ui->plainTextEdit, &QPlainTextEdit::zoomIn);
+    connect(ui->actionZoom_Out, &QAction::triggered, ui->plainTextEdit, &QPlainTextEdit::zoomOut);
+
     // Bytebeat Menu
     connect(ui->action_Play, &QAction::triggered, this, &MainWindow::playBeat);
     connect(ui->actionStop, &QAction::triggered, this, &MainWindow::stopBeat);
