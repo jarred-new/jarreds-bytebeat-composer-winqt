@@ -62,8 +62,18 @@
     <property name="title">
      <string>&amp;View</string>
     </property>
+    <widget class="QMenu" name="menu_Themes">
+     <property name="title">
+      <string>&amp;Themes</string>
+     </property>
+     <addaction name="action_Tropical_Paradise"/>
+     <addaction name="action_Spiced_Pumpkin"/>
+     <addaction name="action_Royal_Sapphire"/>
+    </widget>
     <addaction name="actionZoom_In"/>
     <addaction name="actionZoom_Out"/>
+    <addaction name="separator"/>
+    <addaction name="menu_Themes"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
@@ -322,6 +332,39 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+-</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_Tropical_Paradise">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Tropical Paradise</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_Spiced_Pumpkin">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Spiced Pumpkin</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_Royal_Sapphire">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Royal Sapphire</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

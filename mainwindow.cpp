@@ -2,12 +2,15 @@
 #include "./ui_mainwindow.h"
 
 #include <QSaveFile>
+#include <QSettings>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     ui->plainTextEdit->setPlainText("t*(42&t>>10)");
+
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "JarredApps", "JarredsBeatComposer");
 
     /* Menu and QActions */
     // File
@@ -31,6 +34,23 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionZoom_Out, &QAction::triggered, ui->plainTextEdit, [this]() {
         ui->plainTextEdit->zoomOut(2);
     });
+
+    // Themes
+    connect(ui->action_Tropical_Paradise, &QAction::triggered, this, [this]()
+            { 
+                qApp->setPalette(AppThemePalettes::tropicalParadise()); 
+                settings.setValue("theme", "tropicalParadise");
+            });
+    connect(ui->action_Spiced_Pumpkin, &QAction::triggered, this, [this]()
+            { 
+                qApp->setPalette(AppThemePalettes::spicedPumpkin()); 
+                settings.setValue("theme", "spicedPumpkin");
+            });
+    connect(ui->action_Royal_Sapphire, &QAction::triggered, this, [this]()
+            { 
+                qApp->setPalette(AppThemePalettes::royalSapphire()); 
+                settings.setValue("theme", "royalSapphire");
+            });
 
     // Bytebeat Menu
     connect(ui->action_Play, &QAction::triggered, this, &MainWindow::playBeat);
