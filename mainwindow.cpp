@@ -187,6 +187,7 @@ void MainWindow::playBeat()
         return;
     }
 
+    audioDevice->setBytebeatType(bytebeatType);
     audioDevice->setAudioFormat(format);
     if (audioDevice->open(QIODevice::ReadOnly))
     {
@@ -261,11 +262,13 @@ void MainWindow::setType()
     {
         if (strTypeDlg == "Bytebeat")
         {
-            bytebeatType = 0;
+            bytebeatType = BYTEBEAT_UNSIGNED;
+            ui->statusbar->showMessage("Bytebeat type set to Bytebeat", 2000);
         }
         else if (strTypeDlg == "Signed Bytebeat")
         {
-            bytebeatType = 1;
+            bytebeatType = BYTEBEAT_SIGNED;
+            ui->statusbar->showMessage("Bytebeat type set to Signed Bytebeat", 2000);
         }
         typeLists.clear(); // cleanup
     }

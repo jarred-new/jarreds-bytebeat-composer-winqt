@@ -29,6 +29,7 @@
 #include <QJsonParseError>
 
 #include "bytebeatgenerator.h"
+#include "bytebeattype.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -52,7 +53,7 @@ protected:
 
     int sampleRate = 8000;
 
-    int bytebeatType = 0;
+    BytebeatType bytebeatType = BYTEBEAT_UNSIGNED;
 
 protected slots:
     // file

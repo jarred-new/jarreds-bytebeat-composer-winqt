@@ -13,6 +13,7 @@
 #define exprtk_disable_string_capabilities // Optimizes compilation size/speed
 #include "exprtk.hpp"
 #include "custoperators.h"
+#include "bytebeattype.h"
 
 class BytebeatDevice : public QIODevice {
     Q_OBJECT
@@ -46,6 +47,10 @@ public:
 
     void setAudioFormat(const QAudioFormat &format) {
         audio_format = format;
+    }
+
+    void setBytebeatType(BytebeatType type) {
+        bytebeat_type = type;
     }
 
     bool isSequential() const override {
@@ -85,12 +90,19 @@ protected:
                                              : 0.0;
             const unsigned char sample = static_cast<unsigned char>(
                 wrappedResult < 0 ? wrappedResult + 256.0 : wrappedResult);
-            const double centeredSample = (static_cast<int>(sample) - 128) / 128.0;
+            const int signedSample = bytebeat_type == BYTEBEAT_SIGNED && sample >= 128
+                                         ? static_cast<int>(sample) - 256
+                                         : static_cast<int>(sample);
+            const double centeredSample = bytebeat_type == BYTEBEAT_SIGNED
+                                              ? signedSample / 128.0
+                                              : (static_cast<int>(sample) - 128) / 128.0;
 
             for (int channel = 0; channel < channels; ++channel) {
                 switch (audio_format.sampleFormat()) {
                 case QAudioFormat::UInt8: // 8-bit unsigned PCM
-                    data[offset] = static_cast<char>(sample);
+                    data[offset] = static_cast<char>(bytebeat_type == BYTEBEAT_SIGNED
+                                                         ? signedSample + 128
+                                                         : sample);
                     break;
                 case QAudioFormat::Int16: { // 16-bit signed PCM
                     const qint16 pcmSample = static_cast<qint16>(centeredSample * 32768.0);
@@ -126,6 +138,7 @@ protected:
 private:
     double t_val = 0;
     bool formula_ready = false;
+    BytebeatType bytebeat_type = BYTEBEAT_UNSIGNED;
     QAudioFormat audio_format;
     BytebeatUnsignedRightShift unsigned_right_shift;
     BytebeatBitwiseNot bitwise_not;
