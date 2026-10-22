@@ -25,8 +25,12 @@ MainWindow::MainWindow(QWidget *parent)
             { isChanged = true; });
 
     // View Menu
-    connect(ui->actionZoom_In, &QAction::triggered, ui->plainTextEdit, &QPlainTextEdit::zoomIn);
-    connect(ui->actionZoom_Out, &QAction::triggered, ui->plainTextEdit, &QPlainTextEdit::zoomOut);
+    connect(ui->actionZoom_In, &QAction::triggered, ui->plainTextEdit, [this]() {
+        ui->plainTextEdit->zoomIn(2);
+    });
+    connect(ui->actionZoom_Out, &QAction::triggered, ui->plainTextEdit, [this]() {
+        ui->plainTextEdit->zoomOut(2);
+    });
 
     // Bytebeat Menu
     connect(ui->action_Play, &QAction::triggered, this, &MainWindow::playBeat);
