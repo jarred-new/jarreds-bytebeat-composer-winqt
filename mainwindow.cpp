@@ -27,39 +27,70 @@ MainWindow::MainWindow(QWidget *parent)
             { isChanged = true; });
 
     // View Menu
-    connect(ui->actionZoom_In, &QAction::triggered, ui->plainTextEdit, [this]() {
-        ui->plainTextEdit->zoomIn(2);
-    });
-    connect(ui->actionZoom_Out, &QAction::triggered, ui->plainTextEdit, [this]() {
-        ui->plainTextEdit->zoomOut(2);
-    });
+    connect(ui->actionZoom_In, &QAction::triggered, ui->plainTextEdit, [this]()
+            { ui->plainTextEdit->zoomIn(2); });
+    connect(ui->actionZoom_Out, &QAction::triggered, ui->plainTextEdit, [this]()
+            { ui->plainTextEdit->zoomOut(2); });
 
     // Themes
+    const QString theme = settings.value("theme", "tropicalParadise").toString();
+    if (theme == "tropicalParadise")
+    {
+        ui->action_Tropical_Paradise->setChecked(true);
+        ui->action_Spiced_Pumpkin->setChecked(false);
+        ui->action_Royal_Sapphire->setChecked(false);
+    }
+    else if (theme == "spicedPumpkin")
+    {
+        ui->action_Tropical_Paradise->setChecked(false);
+        ui->action_Spiced_Pumpkin->setChecked(true);
+        ui->action_Royal_Sapphire->setChecked(false);
+    }
+    else if (theme == "royalSapphire")
+    {
+        ui->action_Tropical_Paradise->setChecked(false);
+        ui->action_Spiced_Pumpkin->setChecked(false);
+        ui->action_Royal_Sapphire->setChecked(true);
+    }
+    else
+    {
+        ui->action_Tropical_Paradise->setChecked(true);
+        ui->action_Spiced_Pumpkin->setChecked(false);
+        ui->action_Royal_Sapphire->setChecked(false);
+    }
     connect(ui->action_Tropical_Paradise, &QAction::triggered, this, [this]()
             { 
                 qApp->setPalette(AppThemePalettes::tropicalParadise()); 
                 QSettings settings(QSettings::IniFormat, QSettings::UserScope, "JarredApps", "JarredsBeatComposer");
                 settings.setValue("theme", "tropicalParadise");
-            });
+
+                ui->action_Tropical_Paradise->setChecked(true);
+                ui->action_Spiced_Pumpkin->setChecked(false);
+                ui->action_Royal_Sapphire->setChecked(false); });
     connect(ui->action_Spiced_Pumpkin, &QAction::triggered, this, [this]()
             { 
                 qApp->setPalette(AppThemePalettes::spicedPumpkin()); 
                 QSettings settings(QSettings::IniFormat, QSettings::UserScope, "JarredApps", "JarredsBeatComposer");
                 settings.setValue("theme", "spicedPumpkin");
-            });
+
+                ui->action_Tropical_Paradise->setChecked(false);
+                ui->action_Spiced_Pumpkin->setChecked(true);
+                ui->action_Royal_Sapphire->setChecked(false); });
     connect(ui->action_Royal_Sapphire, &QAction::triggered, this, [this]()
             { 
                 qApp->setPalette(AppThemePalettes::royalSapphire()); 
                 QSettings settings(QSettings::IniFormat, QSettings::UserScope, "JarredApps", "JarredsBeatComposer");
                 settings.setValue("theme", "royalSapphire");
-            });
+
+                ui->action_Tropical_Paradise->setChecked(false);
+                ui->action_Spiced_Pumpkin->setChecked(false);
+                ui->action_Royal_Sapphire->setChecked(true); });
 
     // Bytebeat Menu
     connect(ui->action_Play, &QAction::triggered, this, &MainWindow::playBeat);
     connect(ui->actionStop, &QAction::triggered, this, &MainWindow::stopBeat);
     connect(ui->actionSet_Bytebeat_Type, &QAction::triggered, this, &MainWindow::setType);
     connect(ui->actionSet_Frequency, &QAction::triggered, this, &MainWindow::setFrequency);
-
 }
 
 // cleanup event
@@ -139,7 +170,8 @@ void MainWindow::playBeat()
     audioDevice = new BytebeatDevice(this);
     QString formula = ui->plainTextEdit->toPlainText();
 
-    if (!audioDevice->setFormula(formula)) {
+    if (!audioDevice->setFormula(formula))
+    {
         delete audioDevice;
         audioDevice = nullptr;
         ui->statusbar->showMessage("Invalid bytebeat formula", 5000);
@@ -147,7 +179,8 @@ void MainWindow::playBeat()
     }
 
     audioDevice->setAudioFormat(format);
-    if (audioDevice->open(QIODevice::ReadOnly)) {
+    if (audioDevice->open(QIODevice::ReadOnly))
+    {
         audioSink = new QAudioSink(outputDevice, format, this);
         audioSink->start(audioDevice);
         if (audioSink->error() != QAudio::NoError)
@@ -164,7 +197,9 @@ void MainWindow::playBeat()
         {
             ui->statusbar->showMessage("Playing Bytebeat formula...", 2000);
         }
-    } else {
+    }
+    else
+    {
         ui->statusbar->showMessage("Failed to open sound engine pipeline.", 5000);
         delete audioDevice;
         audioDevice = nullptr;
@@ -215,10 +250,12 @@ void MainWindow::setType()
 
     if (ok)
     {
-        if (strTypeDlg == "Bytebeat") {
+        if (strTypeDlg == "Bytebeat")
+        {
             bytebeatType = 0;
         }
-        else if (strTypeDlg == "Signed Bytebeat") {
+        else if (strTypeDlg == "Signed Bytebeat")
+        {
             bytebeatType = 1;
         }
         typeLists.clear(); // cleanup
