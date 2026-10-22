@@ -23,6 +23,7 @@ qt_add_executable(JarredsBeatComposer
     ${PROJECT_SOURCES}
     bytebeatgenerator.h
     custoperators.h
+    bytebeattype.h
 )
 
 target_compile_options(JarredsBeatComposer PRIVATE

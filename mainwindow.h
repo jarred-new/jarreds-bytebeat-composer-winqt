@@ -52,6 +52,8 @@ protected:
 
     int sampleRate = 8000;
 
+    int bytebeatType = 0;
+
 protected slots:
     // file
     void newFile();
@@ -63,6 +65,7 @@ protected slots:
     void playBeat();
     void stopBeat();
     void setFrequency();
+    void setType();
 
 private:
     bool confirmDiscardChanges();
@@ -72,5 +75,6 @@ private:
     QString currentFilePath;
     BytebeatDevice* audioDevice = nullptr;
     QAudioSink* audioSink = nullptr;
+
 };
 #endif // MAINWINDOW_H

@@ -1,0 +1,9 @@
+#ifndef BYTEBEATTYPE_H
+#define BYTEBEATTYPE_H
+
+enum BytebeatType {
+    BYTEBEAT_UNSIGNED,
+    BYTEBEAT_SIGNED
+};
+
+#endif // BYTEBEATTYPE_H

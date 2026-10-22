@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->plainTextEdit->setPlainText("t");
+    ui->plainTextEdit->setPlainText("t*(42&t>>10)");
 
     /* Menu and QActions */
     // File
@@ -27,7 +27,9 @@ MainWindow::MainWindow(QWidget *parent)
     // Bytebeat Menu
     connect(ui->action_Play, &QAction::triggered, this, &MainWindow::playBeat);
     connect(ui->actionStop, &QAction::triggered, this, &MainWindow::stopBeat);
+    connect(ui->actionSet_Bytebeat_Type, &QAction::triggered, this, &MainWindow::setType);
     connect(ui->actionSet_Frequency, &QAction::triggered, this, &MainWindow::setFrequency);
+
 }
 
 // cleanup event
@@ -166,6 +168,30 @@ void MainWindow::setFrequency()
     if (ok)
     {
         this->sampleRate = inputFreq;
+    }
+}
+
+void MainWindow::setType()
+{
+    bool ok;
+
+    QStringList typeLists;
+    typeLists.append("Bytebeat");
+    typeLists.append("Signed Bytebeat");
+
+    QString strTypeDlg = QInputDialog::getItem(this,
+                                               "Set Bytebeat Type",
+                                               "", typeLists, 0, false, &ok, Qt::Dialog);
+
+    if (ok)
+    {
+        if (strTypeDlg == "Bytebeat") {
+            bytebeatType = 0;
+        }
+        else if (strTypeDlg == "Signed Bytebeat") {
+            bytebeatType = 1;
+        }
+        typeLists.clear(); // cleanup
     }
 }
 
