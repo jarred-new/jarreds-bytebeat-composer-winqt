@@ -23,13 +23,20 @@ public:
         symbol_table.add_constants();
         symbol_table.add_function("ushr", unsigned_right_shift);
         symbol_table.add_function("bitnot", bitwise_not);
+        symbol_table.add_function("bb_and", bitwise_and);
+        symbol_table.add_function("bb_or", bitwise_or);
+        symbol_table.add_function("bb_xor", bitwise_xor);
+        symbol_table.add_function("bb_shl", shift_left);
+        symbol_table.add_function("bb_shr", shift_right);
         expression.register_symbol_table(symbol_table);
     }
 
     bool setFormula(const QString &formulaStr) {
         exprtk::parser<double> parser;
-        // Bytebeat often uses bitwise operators. ExprTk supports standard '&', '|', '^', '<<', '>>'
-        if (!parser.compile(formulaStr.toStdString(), expression)) {
+        std::string translatedFormula;
+        BytebeatFormulaTranslator translator;
+        if (!translator.translate(formulaStr.toStdString(), translatedFormula)
+            || !parser.compile(translatedFormula, expression)) {
             return false; // Failed to parse formula
         }
         t_val = 0; // Reset time index on formula swap
@@ -122,6 +129,11 @@ private:
     QAudioFormat audio_format;
     BytebeatUnsignedRightShift unsigned_right_shift;
     BytebeatBitwiseNot bitwise_not;
+    BytebeatBitwiseBinary bitwise_and{BytebeatBitwiseBinary::Operation::And};
+    BytebeatBitwiseBinary bitwise_or{BytebeatBitwiseBinary::Operation::Or};
+    BytebeatBitwiseBinary bitwise_xor{BytebeatBitwiseBinary::Operation::Xor};
+    BytebeatBitwiseBinary shift_left{BytebeatBitwiseBinary::Operation::LeftShift};
+    BytebeatBitwiseBinary shift_right{BytebeatBitwiseBinary::Operation::RightShift};
     exprtk::symbol_table<double> symbol_table;
     exprtk::expression<double> expression;
 };
