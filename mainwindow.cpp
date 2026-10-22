@@ -87,68 +87,26 @@ void MainWindow::playBeat()
 {
     stopBeat();
 
-    // const QAudioDevice outputDevice = QMediaDevices::defaultAudioOutput();
-    // if (outputDevice.isNull())
-    // {
-    //     ui->statusbar->showMessage("No audio output device is available", 5000);
-    //     return;
-    // }
+    const QAudioDevice outputDevice = QMediaDevices::defaultAudioOutput();
+    if (outputDevice.isNull())
+    {
+        ui->statusbar->showMessage("No audio output device is available", 5000);
+        return;
+    }
 
-    // QAudioFormat format = outputDevice.preferredFormat();
-    // format.setSampleRate(sampleRate);
-    // const bool requestedFormatSupported = outputDevice.isFormatSupported(format);
-    // if (!requestedFormatSupported)
-    // {
-    //     format = outputDevice.preferredFormat();
-    // }
-
-    // audioDevice = new BytebeatGenerator(this);
-    // if (!audioDevice->setFormula(ui->plainTextEdit->toPlainText()))
-    // {
-    //     delete audioDevice;
-    //     audioDevice = nullptr;
-    //     ui->statusbar->showMessage("Invalid bytebeat formula", 5000);
-    //     return;
-    // }
-
-    // audioDevice->setAudioFormat(format);
-    // if (!audioDevice->open(QIODevice::ReadOnly))
-    // {
-    //     ui->statusbar->showMessage("Could not open the bytebeat audio stream", 5000);
-    //     delete audioDevice;
-    //     audioDevice = nullptr;
-    //     return;
-    // }
-
-    // audioSink = new QAudioSink(outputDevice, format, this);
-    // connect(audioSink, &QAudioSink::stateChanged, this, [this](QAudio::State state)
-    //         {
-    //     if (state == QAudio::ActiveState) {
-    //         ui->statusbar->showMessage("Playing", 2000);
-    //     } else if (audioSink != nullptr && audioSink->error() != QAudio::NoError) {
-    //         ui->statusbar->showMessage("Audio playback failed (error "
-    //                                        + QString::number(audioSink->error()) + ")", 5000);
-    //     } });
-    // audioSink->start(audioDevice);
-    // if (audioSink->error() != QAudio::NoError)
-    // {
-    //     ui->statusbar->showMessage("Could not start audio playback (error " + QString::number(audioSink->error()) + ")", 5000);
-    // }
-    // else if (!requestedFormatSupported)
-    // {
-    //     ui->statusbar->showMessage("Requested format unavailable; playing at " + QString::number(format.sampleRate()) + " Hz", 5000);
-    // }
-
-    QAudioFormat format;
-    format.setSampleRate(sampleRate); // Traditional bytebeat clock rate
-    format.setChannelCount(1);  // Mono
-    format.setSampleFormat(QAudioFormat::UInt8); // Unsigned 8-bit PCM
+    QAudioFormat format = outputDevice.preferredFormat();
+    format.setSampleRate(sampleRate);
+    format.setChannelCount(1);
+    format.setSampleFormat(QAudioFormat::Int16);
+    const bool requestedFormatSupported = outputDevice.isFormatSupported(format);
+    if (!requestedFormatSupported)
+    {
+        format = outputDevice.preferredFormat();
+    }
 
     audioDevice = new BytebeatDevice(this);
-    
-    // Note: ExprTk treats bitwise operations out of the box
     QString formula = ui->plainTextEdit->toPlainText();
-    
+
     if (!audioDevice->setFormula(formula)) {
         delete audioDevice;
         audioDevice = nullptr;
@@ -156,16 +114,26 @@ void MainWindow::playBeat()
         return;
     }
 
-    audioSink = new QAudioSink(format, this);
-    
-    // Open device in read-only and fire the engine
+    audioDevice->setAudioFormat(format);
     if (audioDevice->open(QIODevice::ReadOnly)) {
+        audioSink = new QAudioSink(outputDevice, format, this);
         audioSink->start(audioDevice);
-        ui->statusbar->showMessage("Playing Bytebeat formula...", 2000);
+        if (audioSink->error() != QAudio::NoError)
+        {
+            const QString error = QString::number(audioSink->error());
+            stopBeat();
+            ui->statusbar->showMessage("Could not start audio playback (error " + error + ")", 5000);
+        }
+        else if (!requestedFormatSupported)
+        {
+            ui->statusbar->showMessage("Playing with the output device's preferred format", 5000);
+        }
+        else
+        {
+            ui->statusbar->showMessage("Playing Bytebeat formula...", 2000);
+        }
     } else {
         ui->statusbar->showMessage("Failed to open sound engine pipeline.", 5000);
-        delete audioSink;
-        audioSink = nullptr;
         delete audioDevice;
         audioDevice = nullptr;
     }
