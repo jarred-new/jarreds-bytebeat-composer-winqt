@@ -28,11 +28,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     // View Menu
     connect(ui->actionZoom_In, &QAction::triggered, ui->plainTextEdit, [this]()
-            { ui->plainTextEdit->zoomIn(2); });
+            {
+                ui->plainTextEdit->zoomIn(2); });
     connect(ui->actionZoom_Out, &QAction::triggered, ui->plainTextEdit, [this]()
-            { ui->plainTextEdit->zoomOut(2); });
+            { 
+                ui->plainTextEdit->zoomOut(2); });
 
     // Themes
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "JarredApps", "JarredsBeatComposer");
     const QString theme = settings.value("theme", "tropicalParadise").toString();
     if (theme == "tropicalParadise")
     {
@@ -64,6 +67,8 @@ MainWindow::MainWindow(QWidget *parent)
                 QSettings settings(QSettings::IniFormat, QSettings::UserScope, "JarredApps", "JarredsBeatComposer");
                 settings.setValue("theme", "tropicalParadise");
 
+                ui->statusbar->showMessage("Theme changed to Tropical Paradise", 2000);
+
                 ui->action_Tropical_Paradise->setChecked(true);
                 ui->action_Spiced_Pumpkin->setChecked(false);
                 ui->action_Royal_Sapphire->setChecked(false); });
@@ -73,6 +78,8 @@ MainWindow::MainWindow(QWidget *parent)
                 QSettings settings(QSettings::IniFormat, QSettings::UserScope, "JarredApps", "JarredsBeatComposer");
                 settings.setValue("theme", "spicedPumpkin");
 
+                ui->statusbar->showMessage("Theme changed to Spiced Pumpkin", 2000);
+
                 ui->action_Tropical_Paradise->setChecked(false);
                 ui->action_Spiced_Pumpkin->setChecked(true);
                 ui->action_Royal_Sapphire->setChecked(false); });
@@ -81,6 +88,8 @@ MainWindow::MainWindow(QWidget *parent)
                 qApp->setPalette(AppThemePalettes::royalSapphire()); 
                 QSettings settings(QSettings::IniFormat, QSettings::UserScope, "JarredApps", "JarredsBeatComposer");
                 settings.setValue("theme", "royalSapphire");
+
+                ui->statusbar->showMessage("Theme changed to Royal Sapphire", 2000);
 
                 ui->action_Tropical_Paradise->setChecked(false);
                 ui->action_Spiced_Pumpkin->setChecked(false);
