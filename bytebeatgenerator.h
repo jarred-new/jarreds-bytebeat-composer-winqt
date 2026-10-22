@@ -89,20 +89,20 @@ protected:
 
             for (int channel = 0; channel < channels; ++channel) {
                 switch (audio_format.sampleFormat()) {
-                case QAudioFormat::UInt8:
+                case QAudioFormat::UInt8: // 8-bit unsigned PCM
                     data[offset] = static_cast<char>(sample);
                     break;
-                case QAudioFormat::Int16: {
+                case QAudioFormat::Int16: { // 16-bit signed PCM
                     const qint16 pcmSample = static_cast<qint16>(centeredSample * 32768.0);
                     std::memcpy(data + offset, &pcmSample, sizeof(pcmSample));
                     break;
                 }
-                case QAudioFormat::Int32: {
+                case QAudioFormat::Int32: { // 32-bit signed PCM
                     const qint32 pcmSample = static_cast<qint32>(centeredSample * 2147483648.0);
                     std::memcpy(data + offset, &pcmSample, sizeof(pcmSample));
                     break;
                 }
-                case QAudioFormat::Float: {
+                case QAudioFormat::Float: { // 32-bit float PCM
                     const float pcmSample = static_cast<float>(centeredSample);
                     std::memcpy(data + offset, &pcmSample, sizeof(pcmSample));
                     break;
