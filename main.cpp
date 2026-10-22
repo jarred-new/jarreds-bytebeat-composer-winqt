@@ -13,19 +13,15 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setStyle(QStyleFactory::create("fusion"));
     
-    switch (settings.value("theme", "tropicalParadise").toString()) {
-    case "tropicalParadise":
+    const QString theme = settings.value("theme", "tropicalParadise").toString();
+    if (theme == "tropicalParadise") {
         a.setPalette(AppThemePalettes::tropicalParadise());
-        break;
-    case "spicedPumpkin":
+    } else if (theme == "spicedPumpkin") {
         a.setPalette(AppThemePalettes::spicedPumpkin());
-        break;
-    case "royalSapphire":
+    } else if (theme == "royalSapphire") {
         a.setPalette(AppThemePalettes::royalSapphire());
-        break;
-    default:
+    } else {
         a.setPalette(AppThemePalettes::tropicalParadise());
-        break;
     }
 
     MainWindow w;

@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include "appthemepalettes.h"
 
 #include <QSaveFile>
 #include <QSettings>
@@ -9,8 +10,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     ui->plainTextEdit->setPlainText("t*(42&t>>10)");
-
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "JarredApps", "JarredsBeatComposer");
 
     /* Menu and QActions */
     // File
@@ -39,16 +38,19 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->action_Tropical_Paradise, &QAction::triggered, this, [this]()
             { 
                 qApp->setPalette(AppThemePalettes::tropicalParadise()); 
+                QSettings settings(QSettings::IniFormat, QSettings::UserScope, "JarredApps", "JarredsBeatComposer");
                 settings.setValue("theme", "tropicalParadise");
             });
     connect(ui->action_Spiced_Pumpkin, &QAction::triggered, this, [this]()
             { 
                 qApp->setPalette(AppThemePalettes::spicedPumpkin()); 
+                QSettings settings(QSettings::IniFormat, QSettings::UserScope, "JarredApps", "JarredsBeatComposer");
                 settings.setValue("theme", "spicedPumpkin");
             });
     connect(ui->action_Royal_Sapphire, &QAction::triggered, this, [this]()
             { 
                 qApp->setPalette(AppThemePalettes::royalSapphire()); 
+                QSettings settings(QSettings::IniFormat, QSettings::UserScope, "JarredApps", "JarredsBeatComposer");
                 settings.setValue("theme", "royalSapphire");
             });
 
