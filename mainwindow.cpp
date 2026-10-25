@@ -331,9 +331,12 @@ bool MainWindow::openFile()
             sampleRate = json["sampleRate"].toInt();
         }
     }
-    else
+    else if (fileName.endsWith(".txt", Qt::CaseInsensitive))
     {
-        ui->plainTextEdit->setPlainText(file.readAll());
+        QTextStream txtUtf(&file);
+        txtUtf.setEncoding(QStringConverter::Utf16LE);
+
+        ui->plainTextEdit->setPlainText(txtUtf.readAll());
     }
     currentFilePath = fileName;
     isChanged = false;
@@ -408,8 +411,9 @@ bool MainWindow::writeFile(const QString &fileName)
             return false;
         }
     }
-    else
+    else if (fileName.endsWith(".txt", Qt::CaseInsensitive))
     {
+        stream.setEncoding(QStringConverter::Utf16LE);
         stream << ui->plainTextEdit->toPlainText();
         stream.flush();
         if (stream.status() != QTextStream::Ok || !file.commit())
