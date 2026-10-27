@@ -99,6 +99,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionStop, &QAction::triggered, this, &MainWindow::stopBeat);
     connect(ui->actionSet_Bytebeat_Type, &QAction::triggered, this, &MainWindow::setType);
     connect(ui->actionSet_Frequency, &QAction::triggered, this, &MainWindow::setFrequency);
+
+    // Tools Menu
+    connect(ui->actionConvert_txt_to_bb, &QAction::triggered, this, &MainWindow::convertTxtToBB);
 }
 
 // cleanup event
