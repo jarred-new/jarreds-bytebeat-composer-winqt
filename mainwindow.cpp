@@ -101,7 +101,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionSet_Frequency, &QAction::triggered, this, &MainWindow::setFrequency);
 
     // Tools Menu
-    connect(ui->actionConvert_txt_to_bb, &QAction::triggered, this, &MainWindow::convertTxtToBB);
+    connect(ui->actionTxt_to_BB, &QAction::triggered, this, &MainWindow::convertTxtToBB);
 }
 
 // cleanup event
