@@ -10,7 +10,16 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 
+#include <QApplication>
+#include <QFile>
 #include <QFileDialog>
+#include <QIntValidator>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QMessageBox>
+#include <QSaveFile>
+#include <QTextStream>
+#include <QStringConverter>
 
 // Page 1: Welcome Page
 class WelcomePage : public QWizardPage
@@ -80,6 +89,8 @@ public:
 
         QLabel *sampleRateLabel = new QLabel("Set Sample Rate:");
         sampleRateLineEdit = new QLineEdit;
+        sampleRateLineEdit->setText("8000");
+        sampleRateLineEdit->setValidator(new QIntValidator(8000, 192000, sampleRateLineEdit));
         sampleRateLineEdit->setPlaceholderText("e.g., 8000, 11025, 16000, 22050, 32000");
         registerField("conversionOptionsPage.selectedType", typeComboBox);
         registerField("conversionOptionsPage.sampleRate*", sampleRateLineEdit);
@@ -122,11 +133,11 @@ public:
         QString sampleRate = field("conversionOptionsPage.sampleRate").toString();
 
         summaryLabel->setText(QString("You are about to convert the file:\n%1\n\n"
-                                       "Conversion Type: %2\n"
-                                       "Sample Rate: %3")
-                              .arg(file)
-                              .arg(type)
-                              .arg(sampleRate));
+                                      "Conversion Type: %2\n"
+                                      "Sample Rate: %3")
+                                  .arg(file)
+                                  .arg(type)
+                                  .arg(sampleRate));
     }
 
 private:
@@ -172,9 +183,13 @@ class ConvertWizard : public QWizard
 {
     Q_OBJECT
 public:
+    QString selectedFile;
+
     ConvertWizard(QWidget *parent = nullptr) : QWizard(parent)
     {
         setWindowTitle("Convert txt to bb Wizard");
+        setWizardStyle(QWizard::ModernStyle);
+        setPalette(parent ? parent->palette() : QApplication::palette());
 
         addPage(new WelcomePage);
         addPage(new FileSelectionPage);
@@ -184,7 +199,55 @@ public:
 
         setStartId(0);
     }
-};
 
+    void accept() override
+    {
+        const QString inputPath = field("fileSelectionPage.selectedFile").toString();
+        QString outputPath = field("outputFile").toString().trimmed();
+        bool sampleRateOk = false;
+        const int sampleRate = field("conversionOptionsPage.sampleRate").toInt(&sampleRateOk);
+        const int bytebeatType = field("conversionOptionsPage.selectedType").toString() == "Signed Bytebeat" ? 1 : 0;
+
+        if (inputPath.isEmpty() || outputPath.isEmpty() || !sampleRateOk || sampleRate < 8000 || sampleRate > 192000)
+        {
+            QMessageBox::critical(this, "Conversion failed", "Select valid input and output files and a sample rate from 8000 to 192000 Hz.");
+            return;
+        }
+
+        if (!outputPath.endsWith(".bb", Qt::CaseInsensitive))
+            outputPath += ".bb";
+
+        QFile source(inputPath);
+        if (!source.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            QMessageBox::critical(this, "Conversion failed", "The selected input file could not be opened.");
+            return;
+        }
+
+        QTextStream input(&source);
+        input.setEncoding(QStringConverter::Utf16LE);
+        const QString formula = input.readAll();
+        if (input.status() != QTextStream::Ok || formula.trimmed().isEmpty())
+        {
+            QMessageBox::critical(this, "Conversion failed", "The input file is empty or could not be read.");
+            return;
+        }
+
+        QJsonObject data;
+        data["formula"] = formula;
+        data["sampleRate"] = sampleRate;
+        data["bytebeatType"] = bytebeatType;
+
+        QSaveFile output(outputPath);
+        const QByteArray json = QJsonDocument(data).toJson();
+        if (!output.open(QIODevice::WriteOnly) || output.write(json) != json.size() || !output.commit())
+        {
+            QMessageBox::critical(this, "Conversion failed", "The converted file could not be saved.");
+            return;
+        }
+
+        QWizard::accept();
+    }
+};
 
 #endif // CONVERT_WIZARD_H
