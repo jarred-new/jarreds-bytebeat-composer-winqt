@@ -26,7 +26,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -75,10 +75,17 @@
     <addaction name="separator"/>
     <addaction name="menu_Themes"/>
    </widget>
+   <widget class="QMenu" name="menu_Tools">
+    <property name="title">
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="actionTxt_to_BB"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
    <addaction name="menu_View"/>
    <addaction name="menu_Bytebeat"/>
+   <addaction name="menu_Tools"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -107,6 +114,8 @@
    <addaction name="actionSet_Bytebeat_Type"/>
    <addaction name="action_Play"/>
    <addaction name="actionStop"/>
+   <addaction name="separator"/>
+   <addaction name="actionTxt_to_BB"/>
   </widget>
   <action name="actionNew">
    <property name="icon">
@@ -365,6 +374,23 @@
    </property>
    <property name="text">
     <string>&amp;Royal Sapphire</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionTxt_to_BB">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::WindowNew"/>
+   </property>
+   <property name="text">
+    <string>Txt to BB</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Convert your txt to a json-based *.bb file via wizard&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+Shift+C</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

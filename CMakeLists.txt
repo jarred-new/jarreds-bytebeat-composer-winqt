@@ -25,6 +25,7 @@ qt_add_executable(JarredsBeatComposer
     custoperators.h
     bytebeattype.h
     appthemepalettes.h appthemepalettes.cpp
+    convert_wizard.h
 )
 
 target_compile_options(JarredsBeatComposer PRIVATE

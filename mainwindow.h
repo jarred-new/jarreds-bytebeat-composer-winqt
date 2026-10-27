@@ -30,6 +30,8 @@
 
 #include "bytebeatgenerator.h"
 #include "bytebeattype.h"
+#include "appthemepalettes.h"
+#include "convert_wizard.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -68,6 +70,9 @@ protected slots:
     void stopBeat();
     void setFrequency();
     void setType();
+
+    // tools
+    void convertTxtToBB();
 
 private:
     bool confirmDiscardChanges();

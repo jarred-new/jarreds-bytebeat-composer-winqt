@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-#include "appthemepalettes.h"
 
 #include <QSaveFile>
 #include <QSettings>
@@ -274,6 +273,13 @@ void MainWindow::setType()
         }
         typeLists.clear(); // cleanup
     }
+}
+
+// tools
+void MainWindow::convertTxtToBB()
+{
+    ConvertWizard wizard(this);
+    wizard.exec();
 }
 
 // file menu actions
