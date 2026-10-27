@@ -22,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionCopy, &QAction::triggered, ui->plainTextEdit, &QPlainTextEdit::copy);
     connect(ui->actionCut, &QAction::triggered, ui->plainTextEdit, &QPlainTextEdit::cut);
     connect(ui->actionPaste, &QAction::triggered, ui->plainTextEdit, &QPlainTextEdit::paste);
+    connect(ui->action_Undo, &QAction::triggered, ui->plainTextEdit, &QPlainTextEdit::undo);
+    connect(ui->action_Redo, &QAction::triggered, ui->plainTextEdit, &QPlainTextEdit::redo);
     connect(ui->plainTextEdit, &QPlainTextEdit::textChanged, this, [this]()
             { isChanged = true; });
 
@@ -102,6 +104,15 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Tools Menu
     connect(ui->actionTxt_to_BB, &QAction::triggered, this, &MainWindow::convertTxtToBB);
+
+    // Window Menu
+    connect(ui->action_Library, &QAction::toggled, ui->formulasLibraryDock, &QDockWidget::setVisible);
+    connect(ui->action_Output_Logs, &QAction::toggled, ui->outputLogs, &QDockWidget::setVisible);
+    connect(ui->action_Undo_Logs, &QAction::toggled, ui->undoLogs, &QDockWidget::setVisible);
+
+    connect(ui->formulasLibraryDock, &QDockWidget::visibilityChanged, ui->action_Library, &QAction::setChecked);
+    connect(ui->outputLogs, &QDockWidget::visibilityChanged, ui->action_Output_Logs, &QAction::setChecked);
+    connect(ui->undoLogs, &QDockWidget::visibilityChanged, ui->action_Undo_Logs, &QAction::setChecked);
 }
 
 // cleanup event

@@ -7,6 +7,7 @@
 
 #include <QMessageBox>
 #include <QPushButton>
+#include <QDockWidget>
 #include <QClipboard>
 
 #include <QAudioFormat>
