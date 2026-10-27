@@ -54,6 +54,7 @@ protected:
     int sampleRate = 8000;
 
     BytebeatType bytebeatType = BYTEBEAT_UNSIGNED;
+    int bytebeatTypeIndex = 0; // 0 for BYTEBEAT_UNSIGNED, 1 for BYTEBEAT_SIGNED
 
 protected slots:
     // file

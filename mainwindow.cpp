@@ -256,17 +256,19 @@ void MainWindow::setType()
 
     QString strTypeDlg = QInputDialog::getItem(this,
                                                "Set Bytebeat Type",
-                                               "", typeLists, 0, false, &ok, Qt::Dialog);
+                                               "", typeLists, bytebeatTypeIndex, false, &ok, Qt::Dialog);
 
     if (ok)
     {
         if (strTypeDlg == "Bytebeat")
         {
+            bytebeatTypeIndex = 0;
             bytebeatType = BYTEBEAT_UNSIGNED;
             ui->statusbar->showMessage("Bytebeat type set to Bytebeat", 2000);
         }
         else if (strTypeDlg == "Signed Bytebeat")
         {
+            bytebeatTypeIndex = 1;
             bytebeatType = BYTEBEAT_SIGNED;
             ui->statusbar->showMessage("Bytebeat type set to Signed Bytebeat", 2000);
         }
