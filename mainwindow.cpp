@@ -326,11 +326,17 @@ bool MainWindow::openFile()
             ui->statusbar->showMessage("The selected BB file does not contain a valid formula", 5000);
             return false;
         }
-
         ui->plainTextEdit->setPlainText(json["formula"].toString());
+
         if (json.contains("sampleRate") && json["sampleRate"].isDouble())
         {
             sampleRate = json["sampleRate"].toInt();
+        }
+
+        if (json.contains("bytebeatType") && json["bytebeatType"].isDouble())
+        {
+            bytebeatTypeIndex = json["bytebeatType"].toInt();
+            bytebeatType = bytebeatTypeIndex == 0 ? BYTEBEAT_UNSIGNED : BYTEBEAT_SIGNED;
         }
     }
     else if (fileName.endsWith(".txt", Qt::CaseInsensitive))
@@ -403,6 +409,7 @@ bool MainWindow::writeFile(const QString &fileName)
         QJsonObject json;
         json["formula"] = ui->plainTextEdit->toPlainText();
         json["sampleRate"] = sampleRate;
+        json["bytebeatType"] = bytebeatTypeIndex;
 
         QJsonDocument doc(json);
         stream << doc.toJson();
