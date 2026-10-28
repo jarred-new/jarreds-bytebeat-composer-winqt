@@ -10,7 +10,7 @@
 #include <QDockWidget>
 #include <QClipboard>
 #include <QTextDocument>
-#include <QUndoGroup>
+#include <QUndoStack>
 
 #include <QAudioFormat>
 #include <QAudioSink>
@@ -85,7 +85,8 @@ private:
     QString currentFilePath;
     BytebeatDevice* audioDevice = nullptr;
     QAudioSink* audioSink = nullptr;
-    QTextDocument *doc;
-    QUndoGroup *undoGroup;
+    QString previousEditorText;
+    bool applyingUndoCommand = false;
+    QUndoStack *undoStack = nullptr;
 };
 #endif // MAINWINDOW_H

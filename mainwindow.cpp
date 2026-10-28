@@ -3,12 +3,68 @@
 
 #include <QSaveFile>
 #include <QSettings>
+#include <QTextCursor>
+#include <QUndoCommand>
+
+namespace
+{
+class TextChangeCommand : public QUndoCommand
+{
+public:
+    TextChangeCommand(QPlainTextEdit *editor, QString *previousText, bool *applyingUndoCommand,
+                      bool *isChanged, int position, QString removedText, QString insertedText)
+        : editor(editor), previousText(previousText), applyingUndoCommand(applyingUndoCommand),
+          isChanged(isChanged), position(position), removedText(std::move(removedText)),
+          insertedText(std::move(insertedText))
+    {
+        setText(removedText.isEmpty() ? "Insert text" : insertedText.isEmpty() ? "Delete text" : "Replace text");
+    }
+
+    void undo() override
+    {
+        apply(insertedText.size(), removedText);
+    }
+
+    void redo() override
+    {
+        if (firstRedo)
+        {
+            firstRedo = false;
+            return;
+        }
+        apply(removedText.size(), insertedText);
+    }
+
+private:
+    void apply(int removedLength, const QString &replacement)
+    {
+        *applyingUndoCommand = true;
+        QTextCursor cursor(editor->document());
+        cursor.setPosition(position);
+        cursor.setPosition(position + removedLength, QTextCursor::KeepAnchor);
+        cursor.insertText(replacement);
+        *previousText = editor->toPlainText();
+        *isChanged = true;
+        *applyingUndoCommand = false;
+    }
+
+    QPlainTextEdit *editor;
+    QString *previousText;
+    bool *applyingUndoCommand;
+    bool *isChanged;
+    int position;
+    QString removedText;
+    QString insertedText;
+    bool firstRedo = true;
+};
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     ui->plainTextEdit->setPlainText("t*(42&t>>10)");
+    previousEditorText = ui->plainTextEdit->toPlainText();
 
     /* Menu and QActions */
     // File
@@ -22,10 +78,48 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionCopy, &QAction::triggered, ui->plainTextEdit, &QPlainTextEdit::copy);
     connect(ui->actionCut, &QAction::triggered, ui->plainTextEdit, &QPlainTextEdit::cut);
     connect(ui->actionPaste, &QAction::triggered, ui->plainTextEdit, &QPlainTextEdit::paste);
-    connect(ui->action_Undo, &QAction::triggered, ui->plainTextEdit, &QPlainTextEdit::undo);
-    connect(ui->action_Redo, &QAction::triggered, ui->plainTextEdit, &QPlainTextEdit::redo);
+    undoStack = new QUndoStack(this);
+    ui->plainTextEdit->document()->setUndoRedoEnabled(false);
+    connect(ui->action_Undo, &QAction::triggered, undoStack, &QUndoStack::undo);
+    connect(ui->action_Redo, &QAction::triggered, undoStack, &QUndoStack::redo);
+    ui->action_Undo->setEnabled(false);
+    ui->action_Redo->setEnabled(false);
+    connect(undoStack, &QUndoStack::canUndoChanged, ui->action_Undo, &QAction::setEnabled);
+    connect(undoStack, &QUndoStack::canRedoChanged, ui->action_Redo, &QAction::setEnabled);
     connect(ui->plainTextEdit, &QPlainTextEdit::textChanged, this, [this]()
-            { isChanged = true; });
+            {
+                const QString currentText = ui->plainTextEdit->toPlainText();
+                if (applyingUndoCommand)
+                {
+                    previousEditorText = currentText;
+                    return;
+                }
+
+                int prefixLength = 0;
+                const int shortestLength = qMin(previousEditorText.size(), currentText.size());
+                while (prefixLength < shortestLength && previousEditorText[prefixLength] == currentText[prefixLength])
+                    ++prefixLength;
+
+                int oldSuffix = previousEditorText.size();
+                int newSuffix = currentText.size();
+                while (oldSuffix > prefixLength && newSuffix > prefixLength &&
+                       previousEditorText[oldSuffix - 1] == currentText[newSuffix - 1])
+                {
+                    --oldSuffix;
+                    --newSuffix;
+                }
+
+                const QString removedText = previousEditorText.mid(prefixLength, oldSuffix - prefixLength);
+                const QString insertedText = currentText.mid(prefixLength, newSuffix - prefixLength);
+                if (!removedText.isEmpty() || !insertedText.isEmpty())
+                {
+                    undoStack->push(new TextChangeCommand(ui->plainTextEdit, &previousEditorText,
+                                                          &applyingUndoCommand, &isChanged,
+                                                          prefixLength, removedText, insertedText));
+                }
+                previousEditorText = currentText;
+                isChanged = true;
+            });
 
     // View Menu
     connect(ui->actionZoom_In, &QAction::triggered, ui->plainTextEdit, [this]()
@@ -114,17 +208,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->outputLogs, &QDockWidget::visibilityChanged, ui->action_Output_Logs, &QAction::setChecked);
     connect(ui->undoLogs, &QDockWidget::visibilityChanged, ui->action_Undo_Logs, &QAction::setChecked);
 
-    // undo group
-    doc = ui->plainTextEdit->document();
-    undoGroup = new QUndoGroup(this);
-    ui->undoView->setGroup(undoGroup);
+    ui->undoView->setStack(undoStack);
 }
 
 // cleanup event
 MainWindow::~MainWindow()
 {
-    doc->deleteLater();
-    undoGroup->deleteLater();
     stopBeat();
     delete ui;
 }
@@ -312,7 +401,9 @@ void MainWindow::newFile()
     }
 
     ui->plainTextEdit->clear();
+    undoStack->clear();
     currentFilePath.clear();
+    previousEditorText = ui->plainTextEdit->toPlainText();
     isChanged = false;
     ui->statusbar->showMessage("New file created", 2000);
 }
@@ -374,6 +465,8 @@ bool MainWindow::openFile()
         ui->plainTextEdit->setPlainText(txtUtf.readAll());
     }
     currentFilePath = fileName;
+    undoStack->clear();
+    previousEditorText = ui->plainTextEdit->toPlainText();
     isChanged = false;
     return true;
 }
