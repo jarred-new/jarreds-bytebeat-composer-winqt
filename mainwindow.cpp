@@ -113,11 +113,18 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->formulasLibraryDock, &QDockWidget::visibilityChanged, ui->action_Library, &QAction::setChecked);
     connect(ui->outputLogs, &QDockWidget::visibilityChanged, ui->action_Output_Logs, &QAction::setChecked);
     connect(ui->undoLogs, &QDockWidget::visibilityChanged, ui->action_Undo_Logs, &QAction::setChecked);
+
+    // undo group
+    doc = ui->plainTextEdit->document();
+    undoGroup = new QUndoGroup(this);
+    ui->undoView->setGroup(undoGroup);
 }
 
 // cleanup event
 MainWindow::~MainWindow()
 {
+    doc->deleteLater();
+    undoGroup->deleteLater();
     stopBeat();
     delete ui;
 }
@@ -294,6 +301,11 @@ void MainWindow::convertTxtToBB()
 {
     ConvertWizard wizard(this);
     wizard.exec();
+}
+
+void MainWindow::onUndoCommand()
+{
+
 }
 
 // file menu actions

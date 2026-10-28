@@ -9,6 +9,8 @@
 #include <QPushButton>
 #include <QDockWidget>
 #include <QClipboard>
+#include <QTextDocument>
+#include <QUndoGroup>
 
 #include <QAudioFormat>
 #include <QAudioSink>
@@ -83,6 +85,7 @@ private:
     QString currentFilePath;
     BytebeatDevice* audioDevice = nullptr;
     QAudioSink* audioSink = nullptr;
-
+    QTextDocument *doc;
+    QUndoGroup *undoGroup;
 };
 #endif // MAINWINDOW_H
