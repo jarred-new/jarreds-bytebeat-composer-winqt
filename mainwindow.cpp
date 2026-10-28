@@ -303,11 +303,6 @@ void MainWindow::convertTxtToBB()
     wizard.exec();
 }
 
-void MainWindow::onUndoCommand()
-{
-
-}
-
 // file menu actions
 void MainWindow::newFile()
 {
