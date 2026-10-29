@@ -31,6 +31,8 @@
 #include <QJsonArray>
 #include <QJsonParseError>
 
+#include <QMetaObject>
+
 #include "bytebeatgenerator.h"
 #include "bytebeattype.h"
 #include "appthemepalettes.h"
@@ -50,6 +52,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
+    static void showMessageToMainWindow(QString message, int duration);
 
 protected:
     // Close event
@@ -79,11 +82,13 @@ protected slots:
     // tools
     void convertTxtToBB();
 
+public slots:
+    void addLogs(QString message, int duration);
+
 private:
     bool confirmDiscardChanges();
     bool writeFile(const QString& fileName);
-    void updateWindowTitle();
-    void addLogs(QString message);
+    void updateWindowTitle();    
 
     Ui::MainWindow *ui;
     QString currentFilePath;

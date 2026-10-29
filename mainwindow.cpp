@@ -165,8 +165,7 @@ MainWindow::MainWindow(QWidget *parent)
                 QSettings settings(QSettings::IniFormat, QSettings::UserScope, "JarredApps", "JarredsBeatComposer");
                 settings.setValue("theme", "tropicalParadise");
 
-                ui->statusbar->showMessage("Theme changed to Tropical Paradise", 2000);
-                addLogs("Theme changed to Tropical Paradise");
+                addLogs("Theme changed to Tropical Paradise", 2000);
 
                 ui->action_Tropical_Paradise->setChecked(true);
                 ui->action_Spiced_Pumpkin->setChecked(false);
@@ -177,8 +176,7 @@ MainWindow::MainWindow(QWidget *parent)
                 QSettings settings(QSettings::IniFormat, QSettings::UserScope, "JarredApps", "JarredsBeatComposer");
                 settings.setValue("theme", "spicedPumpkin");
 
-                ui->statusbar->showMessage("Theme changed to Spiced Pumpkin", 2000);
-                addLogs("Theme changed to Spiced Pumpkin");
+                addLogs("Theme changed to Spiced Pumpkin", 2000);
 
                 ui->action_Tropical_Paradise->setChecked(false);
                 ui->action_Spiced_Pumpkin->setChecked(true);
@@ -189,8 +187,7 @@ MainWindow::MainWindow(QWidget *parent)
                 QSettings settings(QSettings::IniFormat, QSettings::UserScope, "JarredApps", "JarredsBeatComposer");
                 settings.setValue("theme", "royalSapphire");
 
-                ui->statusbar->showMessage("Theme changed to Royal Sapphire", 2000);
-                addLogs("Theme changed to Royal Sapphire");
+                addLogs("Theme changed to Royal Sapphire", 2000);
 
                 ui->action_Tropical_Paradise->setChecked(false);
                 ui->action_Spiced_Pumpkin->setChecked(false);
@@ -298,8 +295,7 @@ void MainWindow::playBeat()
     const QAudioDevice outputDevice = QMediaDevices::defaultAudioOutput();
     if (outputDevice.isNull())
     {
-        ui->statusbar->showMessage("No audio output device is available", 5000);
-        addLogs("No audio output device is available");
+        addLogs("No audio output device is available", 5000);
         return;
     }
 
@@ -320,8 +316,7 @@ void MainWindow::playBeat()
     {
         delete audioDevice;
         audioDevice = nullptr;
-        ui->statusbar->showMessage("Invalid bytebeat formula", 5000);
-        addLogs("Invalid bytebeat formula");
+        addLogs("Invalid bytebeat formula", 5000);
         return;
     }
 
@@ -335,24 +330,20 @@ void MainWindow::playBeat()
         {
             const QString error = QString::number(audioSink->error());
             stopBeat();
-            ui->statusbar->showMessage("Could not start audio playback (error " + error + ")", 5000);
-            addLogs("Could not start audio playback (error " + error + ")");
+            addLogs("Could not start audio playback (error " + error + ")", 5000);
         }
         else if (!requestedFormatSupported)
         {
-            ui->statusbar->showMessage("Playing with the output device's preferred format", 5000);
-            addLogs("Playing with the output device's preferred format");
+            addLogs("Playing with the output device's preferred format", 5000);
         }
         else
         {
-            ui->statusbar->showMessage("Playing Bytebeat formula...", 2000);
-            addLogs("Playing Bytebeat formula...");
+            addLogs("Playing Bytebeat formula...", 2000);
         }
     }
     else
     {
-        ui->statusbar->showMessage("Failed to open sound engine pipeline.", 5000);
-        addLogs("Failed to open sound engine pipeline.");
+        addLogs("Failed to open sound engine pipeline.", 5000);
         delete audioDevice;
         audioDevice = nullptr;
     }
@@ -402,12 +393,11 @@ void MainWindow::exportWav()
                                       durationSeconds, &errorMessage);
     if (!exported) {
         QMessageBox::warning(this, "WAV Export Failed", errorMessage);
-        addLogs("WAV export failed: " + errorMessage);
+        addLogs("WAV export failed: " + errorMessage, 5000);
         return;
     }
 
-    ui->statusbar->showMessage("WAV exported successfully", 3000);
-    addLogs("Exported WAV audio to " + filePath);
+    addLogs("WAV exported successfully to " + filePath, 3000);
 }
 
 void MainWindow::setFrequency()
@@ -442,15 +432,13 @@ void MainWindow::setType()
         {
             bytebeatTypeIndex = 0;
             bytebeatType = BYTEBEAT_UNSIGNED;
-            ui->statusbar->showMessage("Bytebeat type set to Bytebeat", 2000);
-            addLogs("Bytebeat type set to Bytebeat");
+            addLogs("Bytebeat type set to Bytebeat", 2000);
         }
         else if (strTypeDlg == "Signed Bytebeat")
         {
             bytebeatTypeIndex = 1;
             bytebeatType = BYTEBEAT_SIGNED;
-            ui->statusbar->showMessage("Bytebeat type set to Signed Bytebeat", 2000);
-            addLogs("Bytebeat type set to Signed Bytebeat");
+            addLogs("Bytebeat type set to Signed Bytebeat", 2000);
         }
         typeLists.clear(); // cleanup
     }
@@ -477,8 +465,7 @@ void MainWindow::newFile()
     updateWindowTitle();
     previousEditorText = ui->plainTextEdit->toPlainText();
     isChanged = false;
-    ui->statusbar->showMessage("New file created", 2000);
-    addLogs("New file created");
+    addLogs("New file created", 2000);
 }
 
 bool MainWindow::openFile()
@@ -497,8 +484,7 @@ bool MainWindow::openFile()
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        ui->statusbar->showMessage("Could not open the selected file", 5000);
-        addLogs("Could not open the selected file");
+        addLogs("Could not open the selected file", 5000);
         return false;
     }
 
@@ -508,16 +494,14 @@ bool MainWindow::openFile()
         QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &parseError);
         if (parseError.error != QJsonParseError::NoError || !doc.isObject())
         {
-            ui->statusbar->showMessage("Could not parse the selected BB file", 5000);
-            addLogs("Could not parse the selected BB file");
+            addLogs("Could not parse the selected BB file", 5000);
             return false;
         }
 
         QJsonObject json = doc.object();
         if (!json.contains("formula") || !json["formula"].isString())
         {
-            ui->statusbar->showMessage("The selected BB file does not contain a valid formula", 5000);
-            addLogs("The selected BB file does not contain a valid formula");
+            addLogs("The selected BB file does not contain a valid formula", 5000);
             return false;
         }
         ui->plainTextEdit->setPlainText(json["formula"].toString());
@@ -595,8 +579,7 @@ bool MainWindow::writeFile(const QString &fileName)
     QSaveFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
-        ui->statusbar->showMessage("Could not save the selected file", 5000);
-        addLogs("Could not save the selected file");
+        addLogs("Could not save the selected file", 5000);
         return false;
     }
 
@@ -614,8 +597,7 @@ bool MainWindow::writeFile(const QString &fileName)
         stream.flush();
         if (stream.status() != QTextStream::Ok || !file.commit())
         {
-            ui->statusbar->showMessage("Could not save the selected file", 5000);
-            addLogs("Could not save the selected file");
+            addLogs("Could not save the selected file", 5000);
             return false;
         }
     }
@@ -626,8 +608,7 @@ bool MainWindow::writeFile(const QString &fileName)
         stream.flush();
         if (stream.status() != QTextStream::Ok || !file.commit())
         {
-            ui->statusbar->showMessage("Could not save the selected file", 5000);
-            addLogs("Could not save the selected file");
+            addLogs("Could not save the selected file", 5000);
             return false;
         }
     }
@@ -635,8 +616,7 @@ bool MainWindow::writeFile(const QString &fileName)
     currentFilePath = fileName;
     updateWindowTitle();
     isChanged = false;
-    ui->statusbar->showMessage("Saved " + currentFilePath, 3000);
-    addLogs("Saved " + currentFilePath);
+    addLogs("Saved " + currentFilePath, 3000);
     return true;
 }
 
@@ -648,7 +628,18 @@ void MainWindow::updateWindowTitle()
     setWindowTitle(QStringLiteral("Jarred's Bytebeat Composer - %1").arg(fileName));
 }
 
-void MainWindow::addLogs(QString message)
+void MainWindow::addLogs(QString message, int duration)
 {
     ui->listWidget->addItem(message);
+    ui->statusbar->showMessage(message, duration);
+}
+
+void MainWindow::showMessageToMainWindow(QString message, int duration)
+{
+    if (instance)
+    {
+        QMetaObject::invokeMethod(instance,
+                                  "addLogs",
+                                  Qt::QueuedConnection);
+    }
 }
