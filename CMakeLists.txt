@@ -18,8 +18,13 @@ set(PROJECT_SOURCES
         mainwindow.ui
 )
 
+set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/assets/resource.rc")
+set(app_icon_resource_qt "${CMAKE_CURRENT_SOURCE_DIR}/assets/res.qrc")
+
 qt_add_executable(JarredsBeatComposer
     MANUAL_FINALIZATION
+    ${app_icon_resource_windows}
+    ${app_icon_resource_qt} 
     ${PROJECT_SOURCES}
     bytebeatgenerator.h
     custoperators.h

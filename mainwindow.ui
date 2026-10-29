@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>611</height>
+    <height>608</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -94,12 +94,20 @@
     <addaction name="action_Output_Logs"/>
     <addaction name="action_Undo_Logs"/>
    </widget>
+   <widget class="QMenu" name="menu_Help">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionAbout_App"/>
+    <addaction name="actionAbout_Qt"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
    <addaction name="menu_View"/>
    <addaction name="menu_Bytebeat"/>
    <addaction name="menu_Tools"/>
    <addaction name="menu_Window"/>
+   <addaction name="menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -538,6 +546,22 @@
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionAbout_App">
+   <property name="text">
+    <string>About &amp;App</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::AboutRole</enum>
+   </property>
+  </action>
+  <action name="actionAbout_Qt">
+   <property name="text">
+    <string>About &amp;Qt</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::AboutQtRole</enum>
    </property>
   </action>
  </widget>

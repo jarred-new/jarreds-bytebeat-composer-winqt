@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>JarredsBeatComposer.ico</file>
+        <file>JarredsBeatComposerDoc.ico</file>
+    </qresource>
+</RCC>
