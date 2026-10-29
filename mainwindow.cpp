@@ -9,61 +9,65 @@
 
 namespace
 {
-class TextChangeCommand : public QUndoCommand
-{
-public:
-    TextChangeCommand(QPlainTextEdit *editor, QString *previousText, bool *applyingUndoCommand,
-                      bool *isChanged, int position, QString removedText, QString insertedText)
-        : editor(editor), previousText(previousText), applyingUndoCommand(applyingUndoCommand),
-          isChanged(isChanged), position(position), removedText(std::move(removedText)),
-          insertedText(std::move(insertedText))
+    class TextChangeCommand : public QUndoCommand
     {
-        setText(removedText.isEmpty() ? "Insert text" : insertedText.isEmpty() ? "Delete text" : "Replace text");
-    }
-
-    void undo() override
-    {
-        apply(insertedText.size(), removedText);
-    }
-
-    void redo() override
-    {
-        if (firstRedo)
+    public:
+        TextChangeCommand(QPlainTextEdit *editor, QString *previousText, bool *applyingUndoCommand,
+                          bool *isChanged, int position, QString removedText, QString insertedText)
+            : editor(editor), previousText(previousText), applyingUndoCommand(applyingUndoCommand),
+              isChanged(isChanged), position(position), removedText(std::move(removedText)),
+              insertedText(std::move(insertedText))
         {
-            firstRedo = false;
-            return;
+            setText(removedText.isEmpty() ? "Insert text" : insertedText.isEmpty() ? "Delete text"
+                                                                                   : "Replace text");
         }
-        apply(removedText.size(), insertedText);
-    }
 
-private:
-    void apply(int removedLength, const QString &replacement)
-    {
-        *applyingUndoCommand = true;
-        QTextCursor cursor(editor->document());
-        cursor.setPosition(position);
-        cursor.setPosition(position + removedLength, QTextCursor::KeepAnchor);
-        cursor.insertText(replacement);
-        *previousText = editor->toPlainText();
-        *isChanged = true;
-        *applyingUndoCommand = false;
-    }
+        void undo() override
+        {
+            apply(insertedText.size(), removedText);
+        }
 
-    QPlainTextEdit *editor;
-    QString *previousText;
-    bool *applyingUndoCommand;
-    bool *isChanged;
-    int position;
-    QString removedText;
-    QString insertedText;
-    bool firstRedo = true;
-};
+        void redo() override
+        {
+            if (firstRedo)
+            {
+                firstRedo = false;
+                return;
+            }
+            apply(removedText.size(), insertedText);
+        }
+
+    private:
+        void apply(int removedLength, const QString &replacement)
+        {
+            *applyingUndoCommand = true;
+            QTextCursor cursor(editor->document());
+            cursor.setPosition(position);
+            cursor.setPosition(position + removedLength, QTextCursor::KeepAnchor);
+            cursor.insertText(replacement);
+            *previousText = editor->toPlainText();
+            *isChanged = true;
+            *applyingUndoCommand = false;
+        }
+
+        QPlainTextEdit *editor;
+        QString *previousText;
+        bool *applyingUndoCommand;
+        bool *isChanged;
+        int position;
+        QString removedText;
+        QString insertedText;
+        bool firstRedo = true;
+    };
 }
+
+MainWindow *MainWindow::instance = nullptr;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    MainWindow::instance = this;
     updateWindowTitle();
     ui->plainTextEdit->setPlainText("t*(42&t>>10)");
     previousEditorText = ui->plainTextEdit->toPlainText();
@@ -121,16 +125,13 @@ MainWindow::MainWindow(QWidget *parent)
                                                           prefixLength, removedText, insertedText));
                 }
                 previousEditorText = currentText;
-                isChanged = true;
-            });
+                isChanged = true; });
 
     // View Menu
     connect(ui->actionZoom_In, &QAction::triggered, ui->plainTextEdit, [this]()
-            {
-                ui->plainTextEdit->zoomIn(2); });
+            { ui->plainTextEdit->zoomIn(2); });
     connect(ui->actionZoom_Out, &QAction::triggered, ui->plainTextEdit, [this]()
-            { 
-                ui->plainTextEdit->zoomOut(2); });
+            { ui->plainTextEdit->zoomOut(2); });
 
     // Themes
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "JarredApps", "JarredsBeatComposer");
@@ -222,14 +223,10 @@ MainWindow::MainWindow(QWidget *parent)
                 aboutBox.setDefaultButton(QMessageBox::Ok);
                 aboutBox.setWindowModality(Qt::WindowModal);
                 aboutBox.setStyleSheet("QLabel{min-width: 400px;}");
-                aboutBox.exec();
-            });
-            
+                aboutBox.exec(); });
+
     connect(ui->actionAbout_Qt, &QAction::triggered, this, [this]()
-            {
-                QMessageBox::aboutQt(this, "About Qt");
-            });
-    
+            { QMessageBox::aboutQt(this, "About Qt"); });
 
     // Undo View
     ui->undoView->setStack(undoStack);
@@ -240,6 +237,7 @@ MainWindow::~MainWindow()
 {
     stopBeat();
     delete ui;
+    delete instance;
 }
 
 // close event
@@ -371,27 +369,31 @@ void MainWindow::exportWav()
     const int durationSeconds = QInputDialog::getInt(
         this, "Export WAV", "Duration (seconds):", 30, 1, 3600, 1,
         &durationAccepted);
-    if (!durationAccepted) {
+    if (!durationAccepted)
+    {
         return;
     }
 
     QString filePath = QFileDialog::getSaveFileName(
         this, "Export WAV", "", "WAV audio (*.wav)");
-    if (filePath.isEmpty()) {
+    if (filePath.isEmpty())
+    {
         return;
     }
-    if (!filePath.endsWith(".wav", Qt::CaseInsensitive)) {
+    if (!filePath.endsWith(".wav", Qt::CaseInsensitive))
+    {
         filePath += ".wav";
     }
 
     QString errorMessage;
     const QString formula = ui->plainTextEdit->toPlainText();
     const bool exported = bytebeatType == BYTEBEAT_SIGNED
-        ? WavExporter::exportSigned(formula, filePath, sampleRate,
-                                    durationSeconds, &errorMessage)
-        : WavExporter::exportUnsigned(formula, filePath, sampleRate,
-                                      durationSeconds, &errorMessage);
-    if (!exported) {
+                              ? WavExporter::exportSigned(formula, filePath, sampleRate,
+                                                          durationSeconds, &errorMessage)
+                              : WavExporter::exportUnsigned(formula, filePath, sampleRate,
+                                                            durationSeconds, &errorMessage);
+    if (!exported)
+    {
         QMessageBox::warning(this, "WAV Export Failed", errorMessage);
         addLogs("WAV export failed: " + errorMessage, 5000);
         return;
@@ -623,8 +625,8 @@ bool MainWindow::writeFile(const QString &fileName)
 void MainWindow::updateWindowTitle()
 {
     const QString fileName = currentFilePath.isEmpty()
-        ? QStringLiteral("Untitled")
-        : QFileInfo(currentFilePath).fileName();
+                                 ? QStringLiteral("Untitled")
+                                 : QFileInfo(currentFilePath).fileName();
     setWindowTitle(QStringLiteral("Jarred's Bytebeat Composer - %1").arg(fileName));
 }
 
@@ -638,8 +640,8 @@ void MainWindow::showMessageToMainWindow(QString message, int duration)
 {
     if (instance)
     {
-        QMetaObject::invokeMethod(instance,
-                                  "addLogs",
-                                  Qt::QueuedConnection);
+        QMetaObject::invokeMethod(instance, "addLogs", Qt::QueuedConnection,
+                                  Q_ARG(QString, message),
+                                  Q_ARG(int, duration));
     }
 }

@@ -92,6 +92,7 @@ private:
 
     Ui::MainWindow *ui;
     QString currentFilePath;
+    static MainWindow *instance;
     BytebeatDevice* audioDevice = nullptr;
     QAudioSink* audioSink = nullptr;
     QString previousEditorText;
