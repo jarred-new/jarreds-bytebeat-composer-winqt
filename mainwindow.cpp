@@ -72,6 +72,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::openFile);
     connect(ui->actionSave, &QAction::triggered, this, &MainWindow::saveFile);
     connect(ui->actionSave_As, &QAction::triggered, this, &MainWindow::saveAsFile);
+    connect(ui->actionExport_WAV, &QAction::triggered, this, &MainWindow::exportWav);
     connect(ui->actionExit, &QAction::triggered, this, &MainWindow::close);
 
     // Edit Menu
@@ -348,6 +349,42 @@ void MainWindow::stopBeat()
         delete audioDevice;
         audioDevice = nullptr;
     }
+}
+
+void MainWindow::exportWav()
+{
+    bool durationAccepted = false;
+    const int durationSeconds = QInputDialog::getInt(
+        this, "Export WAV", "Duration (seconds):", 30, 1, 3600, 1,
+        &durationAccepted);
+    if (!durationAccepted) {
+        return;
+    }
+
+    QString filePath = QFileDialog::getSaveFileName(
+        this, "Export WAV", "", "WAV audio (*.wav)");
+    if (filePath.isEmpty()) {
+        return;
+    }
+    if (!filePath.endsWith(".wav", Qt::CaseInsensitive)) {
+        filePath += ".wav";
+    }
+
+    QString errorMessage;
+    const QString formula = ui->plainTextEdit->toPlainText();
+    const bool exported = bytebeatType == BYTEBEAT_SIGNED
+        ? WavExporter::exportSigned(formula, filePath, sampleRate,
+                                    durationSeconds, &errorMessage)
+        : WavExporter::exportUnsigned(formula, filePath, sampleRate,
+                                      durationSeconds, &errorMessage);
+    if (!exported) {
+        QMessageBox::warning(this, "WAV Export Failed", errorMessage);
+        addLogs("WAV export failed: " + errorMessage);
+        return;
+    }
+
+    ui->statusbar->showMessage("WAV exported successfully", 3000);
+    addLogs("Exported WAV audio to " + filePath);
 }
 
 void MainWindow::setFrequency()

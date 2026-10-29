@@ -35,6 +35,7 @@
 #include "bytebeattype.h"
 #include "appthemepalettes.h"
 #include "convert_wizard.h"
+#include "wavexporter.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -71,6 +72,7 @@ protected slots:
     // bytebeat
     void playBeat();
     void stopBeat();
+    void exportWav();
     void setFrequency();
     void setType();
 

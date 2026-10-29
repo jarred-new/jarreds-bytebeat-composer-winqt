@@ -26,12 +26,15 @@ qt_add_executable(JarredsBeatComposer
     bytebeattype.h
     appthemepalettes.h appthemepalettes.cpp
     convert_wizard.h
-
+    wavexporter.h
 )
 
 target_compile_options(JarredsBeatComposer PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/bigobj>
 )
+
+target_compile_definitions(JarredsBeatComposer PRIVATE _CRT_SECURE_NO_WARNINGS)
+
 
 # if(MSVC)
 #     add_compile_options(/bigobj)
