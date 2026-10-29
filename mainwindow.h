@@ -82,6 +82,7 @@ protected slots:
 private:
     bool confirmDiscardChanges();
     bool writeFile(const QString& fileName);
+    void updateWindowTitle();
     void addLogs(QString message);
 
     Ui::MainWindow *ui;

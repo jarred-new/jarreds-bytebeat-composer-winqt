@@ -2,6 +2,7 @@
 #include "./ui_mainwindow.h"
 
 #include <QSaveFile>
+#include <QFileInfo>
 #include <QSettings>
 #include <QTextCursor>
 #include <QUndoCommand>
@@ -63,6 +64,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    updateWindowTitle();
     ui->plainTextEdit->setPlainText("t*(42&t>>10)");
     previousEditorText = ui->plainTextEdit->toPlainText();
 
@@ -451,6 +453,7 @@ void MainWindow::newFile()
     ui->plainTextEdit->clear();
     undoStack->clear();
     currentFilePath.clear();
+    updateWindowTitle();
     previousEditorText = ui->plainTextEdit->toPlainText();
     isChanged = false;
     ui->statusbar->showMessage("New file created", 2000);
@@ -517,6 +520,7 @@ bool MainWindow::openFile()
         ui->plainTextEdit->setPlainText(txtUtf.readAll());
     }
     currentFilePath = fileName;
+    updateWindowTitle();
     undoStack->clear();
     previousEditorText = ui->plainTextEdit->toPlainText();
     isChanged = false;
@@ -608,10 +612,19 @@ bool MainWindow::writeFile(const QString &fileName)
     }
 
     currentFilePath = fileName;
+    updateWindowTitle();
     isChanged = false;
     ui->statusbar->showMessage("Saved " + currentFilePath, 3000);
     addLogs("Saved " + currentFilePath);
     return true;
+}
+
+void MainWindow::updateWindowTitle()
+{
+    const QString fileName = currentFilePath.isEmpty()
+        ? QStringLiteral("Untitled")
+        : QFileInfo(currentFilePath).fileName();
+    setWindowTitle(QStringLiteral("Jarred's Bytebeat Composer - %1").arg(fileName));
 }
 
 void MainWindow::addLogs(QString message)
