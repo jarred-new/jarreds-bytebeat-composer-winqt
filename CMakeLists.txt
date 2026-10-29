@@ -18,8 +18,11 @@ set(PROJECT_SOURCES
         mainwindow.ui
 )
 
-set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/assets/resource.rc")
 set(app_icon_resource_qt "${CMAKE_CURRENT_SOURCE_DIR}/assets/res.qrc")
+
+if(WIN32 AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/assets/resource.rc")
+    set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/assets/resource.rc")
+endif()
 
 qt_add_executable(JarredsBeatComposer
     MANUAL_FINALIZATION
