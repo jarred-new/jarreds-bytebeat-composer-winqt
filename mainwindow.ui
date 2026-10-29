@@ -116,6 +116,7 @@
    <addaction name="actionOpen"/>
    <addaction name="actionSave"/>
    <addaction name="actionSave_As"/>
+   <addaction name="actionExport_WAV"/>
    <addaction name="separator"/>
    <addaction name="actionCopy"/>
    <addaction name="actionCut"/>
@@ -514,18 +515,21 @@
     <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
-    <action name="actionExport_WAV">
-     <property name="text">
-        <string>Export &amp;WAV...</string>
-     </property>
-     <property name="shortcut">
-        <string>Ctrl+Shift+E</string>
-     </property>
-     <property name="menuRole">
-        <enum>QAction::MenuRole::NoRole</enum>
-     </property>
-    </action>
-    <action name="action_Undo_Logs">
+  <action name="actionExport_WAV">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::AudioCard"/>
+   </property>
+   <property name="text">
+    <string>Export &amp;WAV...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+E</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_Undo_Logs">
    <property name="checkable">
     <bool>true</bool>
    </property>
