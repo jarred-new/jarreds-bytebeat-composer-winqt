@@ -214,6 +214,27 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->outputLogs, &QDockWidget::visibilityChanged, ui->action_Output_Logs, &QAction::setChecked);
     connect(ui->undoLogs, &QDockWidget::visibilityChanged, ui->action_Undo_Logs, &QAction::setChecked);
 
+    // Help Menu
+    connect(ui->actionAbout_App, &QAction::triggered, this, [this]()
+            {
+                QMessageBox aboutBox(this);
+                aboutBox.setWindowTitle("About Jarred's Bytebeat Composer");
+                aboutBox.setText("Jarred's Bytebeat Composer\nVersion 1.0.0\n\nDeveloped by Jarred IzKool\n\nThis application allows you to create and play bytebeat formulas, as well as export them to WAV audio files.");
+                aboutBox.setIconPixmap(QPixmap(":/JarredsBeatComposer.ico").scaled(64, 64));
+                aboutBox.setStandardButtons(QMessageBox::Ok);
+                aboutBox.setDefaultButton(QMessageBox::Ok);
+                aboutBox.setWindowModality(Qt::WindowModal);
+                aboutBox.setStyleSheet("QLabel{min-width: 400px;}");
+                aboutBox.exec();
+            });
+            
+    connect(ui->actionAbout_Qt, &QAction::triggered, this, [this]()
+            {
+                QMessageBox::aboutQt(this, "About Qt");
+            });
+    
+
+    // Undo View
     ui->undoView->setStack(undoStack);
 }
 

@@ -28,8 +28,8 @@ class WelcomePage : public QWizardPage
 public:
     WelcomePage(QWidget *parent = nullptr) : QWizardPage(parent)
     {
-        setTitle("Welcome to the Convert Wizard");
-        QLabel *label = new QLabel("This wizard will help you convert your files.");
+        setTitle("Welcome to the Txt to BB Convert Wizard");
+        QLabel *label = new QLabel("This wizard will help you to convert a formula that is based on a text file into a .bb file that can be used in Jarred's Bytebeat Composer.");
         QVBoxLayout *layout = new QVBoxLayout;
         layout->addWidget(label);
         setLayout(layout);
