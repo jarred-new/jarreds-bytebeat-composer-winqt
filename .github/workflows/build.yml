@@ -127,6 +127,20 @@ jobs:
             "build\Release\JarredsBeatComposer.exe" `
             "package\JarredsBeatComposer.exe"
 
+      # ----------------------------------------
+      # Copy additional files
+      # ----------------------------------------
+      - name: Copy additional files
+        shell: pwsh
+        run: |
+          Copy-Item `
+            "assets\JarredsBeatComposer.ico" `
+            "package\JarredsBeatComposer.ico"
+
+          Copy-Item `
+            "assets\JarredsBeatComposerDoc.ico" `
+            "package\JarredsBeatComposerDoc.ico"
+
       # - name: Add release documentation
       #   shell: pwsh
       #   run: |
