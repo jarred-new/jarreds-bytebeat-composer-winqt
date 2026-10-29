@@ -21,6 +21,9 @@
 #include <QTextStream>
 #include <QStringConverter>
 
+#include <functional>
+#include <utility>
+
 // Page 1: Welcome Page
 class WelcomePage : public QWizardPage
 {
@@ -183,9 +186,12 @@ class ConvertWizard : public QWizard
 {
     Q_OBJECT
 public:
+    using MessageHandler = std::function<void(QString, int)>;
+
     QString selectedFile;
 
-    ConvertWizard(QWidget *parent = nullptr) : QWizard(parent)
+    ConvertWizard(QWidget *parent = nullptr, MessageHandler messageHandler = {})
+        : QWizard(parent), messageHandler(std::move(messageHandler))
     {
         setWindowTitle("Convert txt to bb Wizard");
         setWizardStyle(QWizard::ModernStyle);
@@ -210,7 +216,7 @@ public:
 
         if (inputPath.isEmpty() || outputPath.isEmpty() || !sampleRateOk || sampleRate < 8000 || sampleRate > 192000)
         {
-            QMessageBox::critical(this, "Conversion failed", "Select valid input and output files and a sample rate from 8000 to 192000 Hz.");
+            reportFailure("Select valid input and output files and a sample rate from 8000 to 192000 Hz.");
             return;
         }
 
@@ -220,7 +226,7 @@ public:
         QFile source(inputPath);
         if (!source.open(QIODevice::ReadOnly | QIODevice::Text))
         {
-            QMessageBox::critical(this, "Conversion failed", "The selected input file could not be opened.");
+            reportFailure("The selected input file could not be opened.");
             return;
         }
 
@@ -229,7 +235,7 @@ public:
         const QString formula = input.readAll();
         if (input.status() != QTextStream::Ok || formula.trimmed().isEmpty())
         {
-            QMessageBox::critical(this, "Conversion failed", "The input file is empty or could not be read.");
+            reportFailure("The input file is empty or could not be read.");
             return;
         }
 
@@ -242,12 +248,24 @@ public:
         const QByteArray json = QJsonDocument(data).toJson();
         if (!output.open(QIODevice::WriteOnly) || output.write(json) != json.size() || !output.commit())
         {
-            QMessageBox::critical(this, "Conversion failed", "The converted file could not be saved.");
+            reportFailure("The converted file could not be saved.");
             return;
         }
 
+        if (messageHandler)
+            messageHandler("Conversion completed successfully: " + outputPath, 3000);
         QWizard::accept();
     }
+
+private:
+    void reportFailure(const QString &message)
+    {
+        QMessageBox::critical(this, "Conversion failed", message);
+        if (messageHandler)
+            messageHandler(message, 5000);
+    }
+
+    MessageHandler messageHandler;
 };
 
 #endif // CONVERT_WIZARD_H

@@ -449,7 +449,7 @@ void MainWindow::setType()
 // tools
 void MainWindow::convertTxtToBB()
 {
-    ConvertWizard wizard(this);
+    ConvertWizard wizard(this, &MainWindow::showMessageToMainWindow);
     wizard.exec();
 }
 
