@@ -408,7 +408,7 @@ void MainWindow::setFrequency()
     int inputFreq = QInputDialog::getInt(this,
                                          "Set Frequency",
                                          "example: 8000, 11025, 16000, 22050, 32000, etc.",
-                                         sampleRate, 8000, 192000, 100, &ok, Qt::Dialog);
+                                         sampleRate, 4000, 192000, 100, &ok, Qt::Dialog);
 
     if (ok)
     {

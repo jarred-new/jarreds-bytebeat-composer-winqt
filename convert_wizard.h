@@ -93,7 +93,7 @@ public:
         QLabel *sampleRateLabel = new QLabel("Set Sample Rate:");
         sampleRateLineEdit = new QLineEdit;
         sampleRateLineEdit->setText("8000");
-        sampleRateLineEdit->setValidator(new QIntValidator(8000, 192000, sampleRateLineEdit));
+        sampleRateLineEdit->setValidator(new QIntValidator(4000, 192000, sampleRateLineEdit));
         sampleRateLineEdit->setPlaceholderText("e.g., 8000, 11025, 16000, 22050, 32000");
         registerField("conversionOptionsPage.selectedType", typeComboBox);
         registerField("conversionOptionsPage.sampleRate*", sampleRateLineEdit);
@@ -214,9 +214,9 @@ public:
         const int sampleRate = field("conversionOptionsPage.sampleRate").toInt(&sampleRateOk);
         const int bytebeatType = field("conversionOptionsPage.selectedType").toString() == "Signed Bytebeat" ? 1 : 0;
 
-        if (inputPath.isEmpty() || outputPath.isEmpty() || !sampleRateOk || sampleRate < 8000 || sampleRate > 192000)
+        if (inputPath.isEmpty() || outputPath.isEmpty() || !sampleRateOk || sampleRate < 4000 || sampleRate > 192000)
         {
-            reportFailure("Select valid input and output files and a sample rate from 8000 to 192000 Hz.");
+            reportFailure("Select valid input and output files and a sample rate from 4000 to 192000 Hz.");
             return;
         }
 
