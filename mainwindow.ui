@@ -101,11 +101,19 @@
     <addaction name="actionAbout_App"/>
     <addaction name="actionAbout_Qt"/>
    </widget>
+   <widget class="QMenu" name="menu_Libraries">
+    <property name="title">
+     <string>&amp;Libraries</string>
+    </property>
+    <addaction name="action_Add_Formula_to_Library"/>
+    <addaction name="action_Remove_Formula_from_Library"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
    <addaction name="menu_View"/>
    <addaction name="menu_Bytebeat"/>
    <addaction name="menu_Tools"/>
+   <addaction name="menu_Libraries"/>
    <addaction name="menu_Window"/>
    <addaction name="menu_Help"/>
   </widget>
@@ -125,6 +133,9 @@
    <addaction name="actionSave"/>
    <addaction name="actionSave_As"/>
    <addaction name="actionExport_WAV"/>
+   <addaction name="separator"/>
+   <addaction name="action_Add_Formula_to_Library"/>
+   <addaction name="action_Remove_Formula_from_Library"/>
    <addaction name="separator"/>
    <addaction name="actionCopy"/>
    <addaction name="actionCut"/>
@@ -562,6 +573,34 @@
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::AboutQtRole</enum>
+   </property>
+  </action>
+  <action name="action_Add_Formula_to_Library">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::ListAdd"/>
+   </property>
+   <property name="text">
+    <string>&amp;Add Formula to Library</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+=</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_Remove_Formula_from_Library">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::ListRemove"/>
+   </property>
+   <property name="text">
+    <string>&amp;Remove Formula from Library</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Del</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
  </widget>

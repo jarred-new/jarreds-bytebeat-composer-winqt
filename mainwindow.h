@@ -84,6 +84,10 @@ protected slots:
     // tools
     void convertTxtToBB();
 
+    // library
+    void addFormulaToLibrary();
+    void removeFormulaFromLibrary();
+
 public slots:
     void addLogs(QString message, int duration);
 

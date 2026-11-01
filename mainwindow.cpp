@@ -245,6 +245,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->outputLogs, &QDockWidget::visibilityChanged, ui->action_Output_Logs, &QAction::setChecked);
     connect(ui->undoLogs, &QDockWidget::visibilityChanged, ui->action_Undo_Logs, &QAction::setChecked);
 
+    // Libraries
+    connect(ui->action_Add_Formula_to_Library, &QAction::triggered, this, &MainWindow::addFormulaToLibrary);
+    connect(ui->action_Remove_Formula_from_Library, &QAction::triggered, this, &MainWindow::removeFormulaFromLibrary);
+
     // Help Menu
     connect(ui->actionAbout_App, &QAction::triggered, this, [this]()
             {
@@ -676,5 +680,93 @@ void MainWindow::showMessageToMainWindow(QString message, int duration)
         QMetaObject::invokeMethod(instance, "addLogs", Qt::QueuedConnection,
                                   Q_ARG(QString, message),
                                   Q_ARG(int, duration));
+    }
+}
+
+void MainWindow::addFormulaToLibrary()
+{
+    QString formula = ui->plainTextEdit->toPlainText();
+    if (formula.isEmpty())
+    {
+        addLogs("Cannot add an empty formula to the library", 5000);
+        return;
+    }
+
+    bool ok;
+    QString name = QInputDialog::getText(this, "Add Formula to Library", "Enter a name for the formula:", QLineEdit::Normal, "", &ok);
+    if (!ok || name.isEmpty())
+    {
+        addLogs("Formula addition canceled or name is empty", 5000);
+        return;
+    }
+
+    QJsonObject newEntry;
+    newEntry["name"] = name;
+    newEntry["formula"] = formula;
+    newEntry["sampleRate"] = sampleRate;
+    newEntry["bytebeatType"] = bytebeatTypeIndex;
+
+    QJsonArray entries = libraryManager->libraryEntries();
+    entries.append(newEntry);
+    libraryManager->setLibraryEntries(entries);
+    if (libraryManager->saveLibrary())
+    {
+        auto *item = new QListWidgetItem(name);
+        item->setData(Qt::UserRole, QVariant::fromValue(newEntry));
+        ui->listWidget_2->addItem(item);
+        addLogs("Formula added to library: " + name, 3000);
+    }
+    else
+    {
+        addLogs("Failed to save the library after adding the formula", 5000);
+    }
+}
+
+void MainWindow::removeFormulaFromLibrary()
+{
+    QMessageBox confirmRemove(this);
+    confirmRemove.setWindowTitle("Remove Formula from Library");
+    confirmRemove.setText("Are you sure you want to remove the selected formula from the library?");
+    confirmRemove.setIcon(QMessageBox::Warning);
+    QPushButton *yesButton = confirmRemove.addButton(QMessageBox::Yes);
+    QPushButton *noButton = confirmRemove.addButton(QMessageBox::No);
+    confirmRemove.setDefaultButton(noButton);
+    confirmRemove.exec();
+
+    if (confirmRemove.clickedButton() == yesButton)
+    {
+        QListWidgetItem *selectedItem = ui->listWidget_2->currentItem();
+        if (!selectedItem)
+        {
+            addLogs("No formula selected to remove from the library", 5000);
+            return;
+        }
+
+        QVariantMap entryToRemove = selectedItem->data(Qt::UserRole).toMap();
+        QJsonArray entries = libraryManager->libraryEntries();
+        QJsonArray updatedEntries;
+
+        for (const QJsonValue &value : entries)
+        {
+            if (value.isObject())
+            {
+                QJsonObject obj = value.toObject();
+                if (obj != entryToRemove)
+                {
+                    updatedEntries.append(obj);
+                }
+            }
+        }
+
+        libraryManager->setLibraryEntries(updatedEntries);
+        if (libraryManager->saveLibrary())
+        {
+            delete selectedItem;
+            addLogs("Formula removed from library", 3000);
+        }
+        else
+        {
+            addLogs("Failed to save the library after removing the formula", 5000);
+        }
     }
 }
