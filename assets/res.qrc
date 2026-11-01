@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>JarredsBeatComposer.ico</file>
         <file>JarredsBeatComposerDoc.ico</file>
+        <file>libraries.json</file>
     </qresource>
 </RCC>

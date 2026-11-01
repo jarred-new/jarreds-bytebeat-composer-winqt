@@ -38,6 +38,8 @@
 #include "appthemepalettes.h"
 #include "convert_wizard.h"
 #include "wavexporter.h"
+#include "jsonlistmodel.h"
+#include "librarymanager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -98,5 +100,7 @@ private:
     QString previousEditorText;
     bool applyingUndoCommand = false;
     QUndoStack *undoStack = nullptr;
+    LibraryManager *libraryManager = nullptr;
+    JsonListModel *libraryModel = nullptr;
 };
 #endif // MAINWINDOW_H

@@ -72,6 +72,39 @@ MainWindow::MainWindow(QWidget *parent)
     ui->plainTextEdit->setPlainText("t*(42&t>>10)");
     previousEditorText = ui->plainTextEdit->toPlainText();
 
+    libraryManager = new LibraryManager(this);
+    libraryModel = new JsonListModel(this);
+    if (libraryManager->loadLibrary())
+    {
+        libraryModel->setJsonData(libraryManager->libraryEntries(), "name");
+        for (int row = 0; row < libraryModel->rowCount(); ++row)
+        {
+            const QModelIndex modelIndex = libraryModel->index(row, 0);
+            auto *item = new QListWidgetItem(libraryModel->data(modelIndex, Qt::DisplayRole).toString());
+            item->setData(Qt::UserRole, libraryModel->data(modelIndex, Qt::UserRole));
+            ui->listWidget_2->addItem(item);
+        }
+    }
+    connect(ui->listWidget_2, &QListWidget::itemClicked, this, [this](QListWidgetItem *item)
+            {
+                const QVariantMap entry = item->data(Qt::UserRole).toMap();
+                ui->plainTextEdit->setPlainText(entry.value("formula").toString());
+
+                const int entrySampleRate = entry.value("sampleRate").toInt();
+                if (entrySampleRate >= 4000 && entrySampleRate <= 192000)
+                    sampleRate = entrySampleRate;
+
+                const int entryBytebeatType = entry.value("bytebeatType").toInt(-1);
+                if (entryBytebeatType == 0 || entryBytebeatType == 1)
+                {
+                    bytebeatTypeIndex = entryBytebeatType;
+                    bytebeatType = bytebeatTypeIndex == 0 ? BYTEBEAT_UNSIGNED : BYTEBEAT_SIGNED;
+                }
+
+                currentFilePath.clear();
+                updateWindowTitle();
+            });
+
     /* Menu and QActions */
     // File
     connect(ui->actionNew, &QAction::triggered, this, &MainWindow::newFile);

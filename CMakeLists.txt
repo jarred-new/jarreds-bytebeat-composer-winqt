@@ -36,6 +36,7 @@ qt_add_executable(JarredsBeatComposer
     convert_wizard.h
     wavexporter.h
     jsonlistmodel.h jsonlistmodel.cpp
+    librarymanager.h librarymanager.cpp
 )
 
 target_compile_options(JarredsBeatComposer PRIVATE

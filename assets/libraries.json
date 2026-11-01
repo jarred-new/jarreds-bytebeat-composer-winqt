@@ -1,0 +1,26 @@
+[
+  {
+    "name": "simple sawtooth",
+    "formula": "t",
+    "sampleRate": 8000,
+    "bytebeatType": 0
+  },
+  {
+    "name": "42 melody",
+    "formula": "t*(42&t>>10)",
+    "sampleRate": 8000,
+    "bytebeatType": 0
+  },
+  {
+    "name": "fractal trees",
+    "formula": "t|t%255|t%257",
+    "sampleRate": 8000,
+    "bytebeatType": 0
+  },
+  {
+    "name": "Shimmer Surfer",
+    "formula": "8*(4*t>>((t>>11|t>>12|t>>(t>>15^t>>10)+5)&7))&64",
+    "sampleRate": 8000,
+    "bytebeatType": 1
+  }
+]
