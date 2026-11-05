@@ -81,3 +81,45 @@ void LibraryManager::setLibraryEntries(const QJsonArray &entries)
     m_libraryDoc = QJsonDocument(entries);
 }
 
+void LibraryManager::importLibraryFromFile(const QString &filePath)
+{
+    QFile inputFile(filePath);
+    if (!inputFile.open(QIODevice::ReadOnly))
+    {
+        qWarning() << "Could not open the formula library for import:" << inputFile.errorString();
+        return;
+    }
+
+    QJsonParseError parseError;
+    const QJsonDocument document = QJsonDocument::fromJson(inputFile.readAll(), &parseError);
+    if (parseError.error != QJsonParseError::NoError || !document.isArray())
+    {
+        qWarning() << "Could not parse the imported formula library:" << parseError.errorString();
+        return;
+    }
+
+    m_libraryDoc = document;
+}
+
+void LibraryManager::exportLibraryToFile(const QString &filePath)
+{
+    if (!m_libraryDoc.isArray())
+    {
+        qWarning() << "No formula library is loaded.";
+        return;
+    }
+
+    QSaveFile outputFile(filePath);
+    if (!outputFile.open(QIODevice::WriteOnly))
+    {
+        qWarning() << "Could not open the formula library for export:" << outputFile.errorString();
+        return;
+    }
+
+    const QByteArray json = m_libraryDoc.toJson(QJsonDocument::Indented);
+    if (outputFile.write(json) != json.size() || !outputFile.commit())
+    {
+        qWarning() << "Could not write the exported formula library:" << outputFile.errorString();
+    }
+}
+

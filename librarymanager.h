@@ -22,6 +22,9 @@ public:
     QJsonArray libraryEntries() const;
     void setLibraryEntries(const QJsonArray &entries);
 
+    void importLibraryFromFile(const QString &filePath);
+    void exportLibraryToFile(const QString &filePath);
+
 private:
     QFile m_libraryFile;
     QJsonDocument m_libraryDoc;
