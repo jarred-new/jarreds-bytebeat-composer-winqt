@@ -248,6 +248,37 @@ MainWindow::MainWindow(QWidget *parent)
     // Libraries
     connect(ui->action_Add_Formula_to_Library, &QAction::triggered, this, &MainWindow::addFormulaToLibrary);
     connect(ui->action_Remove_Formula_from_Library, &QAction::triggered, this, &MainWindow::removeFormulaFromLibrary);
+    connect(ui->action_Import_from_File, &QAction::triggered, this, [this]()
+            {
+                QString filePath = QFileDialog::getOpenFileName(
+                    this, "Import Library", "", "JSON files (*.json)");
+                if (!filePath.isEmpty())
+                {
+                    libraryManager->importLibraryFromFile(filePath);
+                    libraryModel->setJsonData(libraryManager->libraryEntries(), "name");
+                    ui->listWidget_2->clear();
+                    for (int row = 0; row < libraryModel->rowCount(); ++row)
+                    {
+                        const QModelIndex modelIndex = libraryModel->index(row, 0);
+                        auto *item = new QListWidgetItem(libraryModel->data(modelIndex, Qt::DisplayRole).toString());
+                        item->setData(Qt::UserRole, libraryModel->data(modelIndex, Qt::UserRole));
+                        ui->listWidget_2->addItem(item);
+                    }
+                }
+            });
+    connect(ui->action_Export_to_File, &QAction::triggered, this, [this]()
+            {
+                QString filePath = QFileDialog::getSaveFileName(
+                    this, "Export Library", "", "JSON files (*.json)");
+                if (!filePath.isEmpty())
+                {
+                    if (!filePath.endsWith(".json", Qt::CaseInsensitive))
+                    {
+                        filePath += ".json";
+                    }
+                    libraryManager->exportLibraryToFile(filePath);
+                }
+            });
 
     // Help Menu
     connect(ui->actionAbout_App, &QAction::triggered, this, [this]()

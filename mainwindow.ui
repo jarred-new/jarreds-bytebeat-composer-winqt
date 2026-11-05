@@ -107,6 +107,9 @@
     </property>
     <addaction name="action_Add_Formula_to_Library"/>
     <addaction name="action_Remove_Formula_from_Library"/>
+    <addaction name="separator"/>
+    <addaction name="action_Import_from_File"/>
+    <addaction name="action_Export_to_File"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
@@ -542,7 +545,7 @@
     <string>Export &amp;WAV...</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Shift+E</string>
+    <string>Ctrl+E</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
@@ -598,6 +601,28 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+Del</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_Import_from_File">
+   <property name="text">
+    <string>&amp;Import from File</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+I</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_Export_to_File">
+   <property name="text">
+    <string>&amp;Export to File</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+E</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
