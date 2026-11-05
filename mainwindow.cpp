@@ -67,6 +67,11 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::AllowTabbedDocks |
+                   QMainWindow::AllowNestedDocks | QMainWindow::GroupedDragging);
+    setDockNestingEnabled(true);
+    tabifyDockWidget(ui->outputLogs, ui->undoLogs);
+    ui->outputLogs->raise();
     MainWindow::instance = this;
     updateWindowTitle();
     ui->plainTextEdit->setPlainText("t*(42&t>>10)");
