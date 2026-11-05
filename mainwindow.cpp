@@ -94,7 +94,7 @@ MainWindow::MainWindow(QWidget *parent)
                 if (entrySampleRate >= 4000 && entrySampleRate <= 192000)
                     sampleRate = entrySampleRate;
 
-                const int entryBytebeatType = entry.value("bytebeatType").toInt(-1);
+                const int entryBytebeatType = entry.value("bytebeatType", -1).toInt();
                 if (entryBytebeatType == 0 || entryBytebeatType == 1)
                 {
                     bytebeatTypeIndex = entryBytebeatType;
