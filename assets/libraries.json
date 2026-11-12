@@ -1,4 +1,5 @@
 [
+  {"header":"Basic Bytebeat Formulas"},
   {
     "name": "simple sawtooth",
     "formula": "t",
@@ -23,6 +24,7 @@
     "sampleRate": 8000,
     "bytebeatType": 0
   },
+  {"header":"Classic Bytebeat Formulas"},
   {
     "name": "droid (2011-10-05)",
     "formula": "t>>6&1?t>>5:-t>>4",
@@ -383,6 +385,7 @@
     "sampleRate": 8000,
     "bytebeatType": 0
   },
+  {"header":"JarredIzKool's Formulas"},
   {
     "name": "CA98 but cool decay - JarredIzKool (Creator of JBC)",
     "formula": "t*(0xCA98CA98>>(t>>10&30)&15)%256*(1-t%2048/3100)",
