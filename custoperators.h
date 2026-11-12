@@ -392,9 +392,46 @@ private:
         return parsePrimary(result);
     }
 
+    static bool convertHexNumber(const std::string &text, std::string &result) {
+        if (text.size() < 3 || text[0] != '0' || (text[1] != 'x' && text[1] != 'X')) {
+            return false;
+        }
+
+        std::uint64_t value = 0;
+        for (std::size_t i = 2; i < text.size(); ++i) {
+            const unsigned char character = static_cast<unsigned char>(text[i]);
+            unsigned int digit;
+            if (character >= '0' && character <= '9') {
+                digit = character - '0';
+            } else if (character >= 'a' && character <= 'f') {
+                digit = character - 'a' + 10;
+            } else if (character >= 'A' && character <= 'F') {
+                digit = character - 'A' + 10;
+            } else {
+                return false;
+            }
+
+            if (value > (std::numeric_limits<std::uint64_t>::max() - digit) / 16) {
+                return false;
+            }
+            value = value * 16 + digit;
+        }
+
+        result = std::to_string(value);
+        return true;
+    }
+
     bool parsePrimary(std::string &result) {
         if (current().kind == TokenKind::Number) {
-            result = current().text;
+            const std::string number = current().text;
+            if (number.size() > 1 && number[0] == '0'
+                && (number[1] == 'x' || number[1] == 'X')) {
+                if (!convertHexNumber(number, result)) {
+                    return false;
+                }
+            } else {
+                result = number;
+            }
             ++position;
             return true;
         }
