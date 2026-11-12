@@ -386,6 +386,7 @@ private:
             if (!parseUnary(result)) return false;
             if (op == "~") result = "bitnot(" + result + ")";
             else if (op == "!") result = "(not " + result + ")";
+            else if (op == "-") result = "(0 - " + result + ")";
             else result = "(" + op + result + ")";
             return true;
         }
