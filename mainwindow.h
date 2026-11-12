@@ -95,6 +95,7 @@ private:
     bool confirmDiscardChanges();
     bool writeFile(const QString& fileName);
     void updateWindowTitle();    
+    void refreshLibraryList();
 
     Ui::MainWindow *ui;
     QString currentFilePath;

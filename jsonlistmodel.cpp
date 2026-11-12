@@ -24,7 +24,11 @@ QVariant JsonListModel::data(const QModelIndex &index, int role) const {
     // Handle the standard text display role
     if (role == Qt::DisplayRole) {
         QJsonObject obj = m_data.at(index.row()).toObject();
-        return obj.value(m_displayKey).toVariant();
+        const QJsonValue displayValue = obj.value(m_displayKey);
+        if (displayValue.isUndefined() && obj.value("header").isString()) {
+            return obj.value("header").toString();
+        }
+        return displayValue.toVariant();
     }
 
     // Optional: Return a raw QVariantMap/QJsonObject if you use custom delegates

@@ -81,18 +81,14 @@ MainWindow::MainWindow(QWidget *parent)
     libraryModel = new JsonListModel(this);
     if (libraryManager->loadLibrary())
     {
-        libraryModel->setJsonData(libraryManager->libraryEntries(), "name");
-        for (int row = 0; row < libraryModel->rowCount(); ++row)
-        {
-            const QModelIndex modelIndex = libraryModel->index(row, 0);
-            auto *item = new QListWidgetItem(libraryModel->data(modelIndex, Qt::DisplayRole).toString());
-            item->setData(Qt::UserRole, libraryModel->data(modelIndex, Qt::UserRole));
-            ui->listWidget_2->addItem(item);
-        }
+        refreshLibraryList();
     }
     connect(ui->listWidget_2, &QListWidget::itemClicked, this, [this](QListWidgetItem *item)
             {
                 const QVariantMap entry = item->data(Qt::UserRole).toMap();
+                if (entry.contains("header"))
+                    return;
+
                 ui->plainTextEdit->setPlainText(entry.value("formula").toString());
 
                 const int entrySampleRate = entry.value("sampleRate").toInt();
@@ -260,15 +256,7 @@ MainWindow::MainWindow(QWidget *parent)
                 if (!filePath.isEmpty())
                 {
                     libraryManager->importLibraryFromFile(filePath);
-                    libraryModel->setJsonData(libraryManager->libraryEntries(), "name");
-                    ui->listWidget_2->clear();
-                    for (int row = 0; row < libraryModel->rowCount(); ++row)
-                    {
-                        const QModelIndex modelIndex = libraryModel->index(row, 0);
-                        auto *item = new QListWidgetItem(libraryModel->data(modelIndex, Qt::DisplayRole).toString());
-                        item->setData(Qt::UserRole, libraryModel->data(modelIndex, Qt::UserRole));
-                        ui->listWidget_2->addItem(item);
-                    }
+                    refreshLibraryList();
                 }
             });
     connect(ui->action_Export_to_File, &QAction::triggered, this, [this]()
@@ -719,6 +707,30 @@ void MainWindow::showMessageToMainWindow(QString message, int duration)
     }
 }
 
+void MainWindow::refreshLibraryList()
+{
+    libraryModel->setJsonData(libraryManager->libraryEntries(), "name");
+    ui->listWidget_2->clear();
+    for (int row = 0; row < libraryModel->rowCount(); ++row)
+    {
+        const QModelIndex modelIndex = libraryModel->index(row, 0);
+        const QVariantMap entry = libraryModel->data(modelIndex, Qt::UserRole).toMap();
+        auto *item = new QListWidgetItem(libraryModel->data(modelIndex, Qt::DisplayRole).toString());
+        item->setData(Qt::UserRole, entry);
+
+        if (entry.contains("header"))
+        {
+            item->setFlags(Qt::ItemIsEnabled);
+            QFont font = item->font();
+            font.setBold(true);
+            item->setFont(font);
+            item->setBackground(ui->listWidget_2->palette().alternateBase());
+        }
+
+        ui->listWidget_2->addItem(item);
+    }
+}
+
 void MainWindow::addFormulaToLibrary()
 {
     QString formula = ui->plainTextEdit->toPlainText();
@@ -772,7 +784,7 @@ void MainWindow::removeFormulaFromLibrary()
     if (confirmRemove.clickedButton() == yesButton)
     {
         QListWidgetItem *selectedItem = ui->listWidget_2->currentItem();
-        if (!selectedItem)
+        if (!selectedItem || !(selectedItem->flags() & Qt::ItemIsSelectable))
         {
             addLogs("No formula selected to remove from the library", 5000);
             return;
