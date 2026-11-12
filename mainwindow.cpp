@@ -119,7 +119,7 @@ MainWindow::MainWindow(QWidget *parent)
         
         if (!this->currentFilePath.isEmpty()) // filename
         {
-            infoText.append("File Path: " + this->currentFilePath + "\n");
+            infoText.append("File Path: " + QFileInfo(this->currentFilePath).fileName() + "\n");
         } else {
             infoText.append("File Path: (unsaved or untitled)\n");
         }
