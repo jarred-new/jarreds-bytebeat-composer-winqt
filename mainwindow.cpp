@@ -299,7 +299,7 @@ MainWindow::MainWindow(QWidget *parent)
             {
                 QMessageBox aboutBox(this);
                 aboutBox.setWindowTitle("About Jarred's Bytebeat Composer");
-                aboutBox.setText("Jarred's Bytebeat Composer\nVersion 0.0.3\nCreated by: JarredIzKool");
+                aboutBox.setText("Jarred's Bytebeat Composer\nVersion 0.0.4\nCreated by: JarredIzKool");
                 aboutBox.setIconPixmap(QPixmap(":/JarredsBeatComposer.ico").scaled(64, 64));
                 aboutBox.setStandardButtons(QMessageBox::Ok);
                 aboutBox.setDefaultButton(QMessageBox::Ok);
