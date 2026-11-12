@@ -37,6 +37,7 @@
     <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_As"/>
+    <addaction name="actionShow_Info"/>
     <addaction name="separator"/>
     <addaction name="actionExport_WAV"/>
     <addaction name="separator"/>
@@ -135,6 +136,7 @@
    <addaction name="actionOpen"/>
    <addaction name="actionSave"/>
    <addaction name="actionSave_As"/>
+   <addaction name="actionShow_Info"/>
    <addaction name="actionExport_WAV"/>
    <addaction name="separator"/>
    <addaction name="action_Add_Formula_to_Library"/>
@@ -629,6 +631,23 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+E</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionShow_Info">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::HelpAbout"/>
+   </property>
+   <property name="text">
+    <string>Show &amp;Info</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shows the information of the formula's sample rate, bytebeat type, etc.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

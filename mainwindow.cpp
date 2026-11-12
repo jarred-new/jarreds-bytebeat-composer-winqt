@@ -114,6 +114,27 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionSave_As, &QAction::triggered, this, &MainWindow::saveAsFile);
     connect(ui->actionExport_WAV, &QAction::triggered, this, &MainWindow::exportWav);
     connect(ui->actionExit, &QAction::triggered, this, &MainWindow::close);
+    connect(ui->actionShow_Info, &QAction::triggered, this, [this]() {
+        QString infoText;
+        
+        if (!this->currentFilePath.isEmpty()) // filename
+        {
+            infoText.append("File Path: " + this->currentFilePath + "\n");
+        } else {
+            infoText.append("File Path: (unsaved or untitled)\n");
+        }
+        // sample rate
+        infoText.append("Sample Rate: " + QString::number(this->sampleRate) + "\n");
+        // bytebeat type
+        infoText.append("Bytebeat Type: " + QString::number(this->bytebeatType) + "\n");
+
+        QMessageBox msgbox(this);
+        msgbox.setWindowTitle("Information");
+        msgbox.setText(infoText);
+        msgbox.setIcon(QMessageBox::Information);
+        msgbox.setStandardButtons(QMessageBox::Ok);
+        msgbox.exec();
+    });
 
     // Edit Menu
     connect(ui->actionCopy, &QAction::triggered, ui->plainTextEdit, &QPlainTextEdit::copy);
