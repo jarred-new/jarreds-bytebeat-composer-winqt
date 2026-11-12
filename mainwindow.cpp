@@ -290,12 +290,12 @@ MainWindow::MainWindow(QWidget *parent)
             {
                 QMessageBox aboutBox(this);
                 aboutBox.setWindowTitle("About Jarred's Bytebeat Composer");
-                aboutBox.setText("Jarred's Bytebeat Composer\nVersion 1.0.0\n\nDeveloped by Jarred IzKool\n\nThis application allows you to create and play bytebeat formulas, as well as export them to WAV audio files.");
+                aboutBox.setText("Jarred's Bytebeat Composer\nVersion 0.0.3\nCreated by: JarredIzKool");
                 aboutBox.setIconPixmap(QPixmap(":/JarredsBeatComposer.ico").scaled(64, 64));
                 aboutBox.setStandardButtons(QMessageBox::Ok);
                 aboutBox.setDefaultButton(QMessageBox::Ok);
                 aboutBox.setWindowModality(Qt::WindowModal);
-                aboutBox.setStyleSheet("QLabel{min-width: 400px;}");
+                aboutBox.setStyleSheet("QLabel{min-width: 100px;}");
                 aboutBox.exec(); });
 
     connect(ui->actionAbout_Qt, &QAction::triggered, this, [this]()
